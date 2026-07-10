@@ -30,7 +30,7 @@ export default function HeroSection() {
                         <div className="relative w-[280px] sm:w-[360px] md:w-[400px] lg:w-[460px]">
                             <img
                                 src="https://readdy.ai/api/search-image?query=Modern smartphone mockup displaying an elegant Kazakh digital wedding invitation card with golden traditional ornaments and floral borders on screen, floating at angle with soft shadows, clean white studio background, premium product photography style&width=518&height=608&seq=hero-phone-01&orientation=portrait"
-                                alt="Shaqyru.kz мобильді қосымшасы"
+                                alt="Toyga мобильді қосымшасы"
                                 width="518"
                                 height="608"
                                 className="w-full h-auto object-contain"

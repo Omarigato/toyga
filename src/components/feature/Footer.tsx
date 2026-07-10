@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
+import { WHATSAPP_NUMBER } from '@/mocks/homeData';
 
-const footerLinks = [
+const formatPhone = (p: string) => `+${p[0]} ${p.slice(1, 4)} ${p.slice(4, 7)}-${p.slice(7, 9)}-${p.slice(9, 11)}`; const footerLinks = [
     { label: 'Той жайлы', href: '/blog' },
     { label: 'Шақыру үлгілері', href: '/tandau' },
     { label: 'Сурет шақырулар', href: '/suret' },
@@ -15,24 +16,40 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-accent-500 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
+                            <div className="w-9 h-9 rounded-lg bg-accent-50 flex items-center justify-center border border-accent-100 overflow-hidden p-0.5">
+                                <img src="/logo.png" alt="Toyga logo" className="w-full h-full object-contain" />
                             </div>
-                            <span className="text-lg font-bold font-heading">Toyga.kz</span>
+                            <span className="text-lg font-bold font-heading">Toyga</span>
                         </div>
                         <p className="text-background-400 text-sm leading-relaxed max-w-xs">
                             Тойыңызға арналған керемет онлайн шақырулар. Тез, оңай және сапалы.
                         </p>
                         <a
-                            href="https://api.whatsapp.com/send?phone=77066403655"
+                            href={`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}`}
                             target="_blank"
                             rel="nofollow"
                             className="inline-flex items-center gap-2 mt-4 text-sm text-accent-400 hover:text-accent-300 transition-colors"
                         >
-                            +7 706 640-36-55
+                            {formatPhone(WHATSAPP_NUMBER)}
                         </a>
+                        <div className="flex items-center gap-3 mt-6">
+                            <a
+                                href="https://instagram.com/toygakz"
+                                target="_blank"
+                                rel="nofollow"
+                                className="w-8 h-8 rounded-full bg-background-800 flex items-center justify-center text-background-400 hover:text-accent-400 hover:bg-background-700 transition-colors"
+                            >
+                                <i className="ri-instagram-line" />
+                            </a>
+                            <a
+                                href="https://tiktok.com/@toyga.kz"
+                                target="_blank"
+                                rel="nofollow"
+                                className="w-8 h-8 rounded-full bg-background-800 flex items-center justify-center text-background-400 hover:text-accent-400 hover:bg-background-700 transition-colors"
+                            >
+                                <i className="ri-tiktok-line" />
+                            </a>
+                        </div>
                     </div>
 
                     {/* Links */}
@@ -56,7 +73,7 @@ export default function Footer() {
                             WhatsApp арқылы тапсырыс беріңіз — 5 минутта дайын!
                         </p>
                         <a
-                            href="https://api.whatsapp.com/send?phone=77066403655&text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5!"
+                            href={`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5!`}
                             target="_blank"
                             rel="nofollow"
                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent-500 text-white text-sm font-medium hover:bg-accent-600 transition-colors"
@@ -68,11 +85,8 @@ export default function Footer() {
 
                 <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-background-500 text-xs">
-                        © {new Date().getFullYear()} Toyga.kz — Барлық құқықтар қорғалған.
+                        © {new Date().getFullYear()} Toyga — Барлық құқықтар қорғалған.
                     </p>
-                    <Link to="/admin" className="text-background-600 hover:text-background-400 text-xs transition-colors">
-                        Админ
-                    </Link>
                 </div>
             </div>
         </footer>

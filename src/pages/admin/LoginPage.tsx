@@ -1,32 +1,38 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { adminLogin, adminTokenLogin } from '@/lib/apiClient';
 
 export default function AdminLoginPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const token = searchParams.get('token');
+        if (token) {
+            setLoading(true);
+            adminTokenLogin(token)
+                .then(() => navigate('/admin'))
+                .catch(() => setError('Токен қате немесе мерзімі біткен.'))
+                .finally(() => setLoading(false));
+        }
+    }, [searchParams, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        if (!supabase) {
-            setError('Supabase конфигурациясы жоқ. .env файлын тексеріңіз.');
-            setLoading(false);
-            return;
-        }
-
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-        setLoading(false);
-
-        if (authError) {
-            setError('Email немесе пароль қате. Қайта тырысыңыз.');
-        } else {
+        try {
+            await adminLogin(email, password);
             navigate('/admin');
+        } catch {
+            setError('Email немесе пароль қате. Қайта тырысыңыз.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -36,12 +42,10 @@ export default function AdminLoginPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex flex-col items-center gap-2">
-                        <div className="w-14 h-14 rounded-2xl bg-accent-500 flex items-center justify-center shadow-lg">
-                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
+                        <div className="w-14 h-14 rounded-2xl bg-accent-50 flex items-center justify-center shadow-lg border border-accent-100 overflow-hidden p-1">
+                            <img src="/logo.png" alt="Toyga logo" className="w-full h-full object-contain" />
                         </div>
-                        <span className="text-2xl font-bold text-accent-700 font-heading">Toyga.kz</span>
+                        <span className="text-2xl font-bold text-accent-700 font-heading">Toyga</span>
                     </Link>
                     <h1 className="text-lg font-medium text-foreground-700 mt-3">Админ панелі</h1>
                 </div>

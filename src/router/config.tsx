@@ -20,6 +20,7 @@ const routes: RouteObject[] = [
     { path: "/blog/:slug", element: <BlogDetail /> },
     { path: "/musics", element: <Musics /> },
     { path: "/i/:slug", element: <InvitationPage /> },
+    { path: "/login", element: <AdminLoginPage /> },
     { path: "/admin/login", element: <AdminLoginPage /> },
     { path: "/admin", element: <AdminDashboardPage /> },
     { path: "*", element: <NotFound /> },

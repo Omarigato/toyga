@@ -1,4 +1,4 @@
-export const WHATSAPP_NUMBER = "77066403655";
+export const WHATSAPP_NUMBER = "77771335250";
 
 export interface Category {
     id: number;

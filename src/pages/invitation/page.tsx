@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getInvitation, getInvitationGuests, submitGuest, type DBInvitation, type DBGuest } from '@/lib/api';
+import { getInvitation, getGuests, submitGuest, type InvitationPublic, type Guest } from '@/lib/apiClient';
 
-// ── Countdown ─────────────────────────────────────────────────────────────────
 function Countdown({ eventDate }: { eventDate: string }) {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -45,7 +44,6 @@ function Countdown({ eventDate }: { eventDate: string }) {
     );
 }
 
-// ── RSVP Form ─────────────────────────────────────────────────────────────────
 function RSVPForm({ invitationId }: { invitationId: number }) {
     const [form, setForm] = useState({ name: '', rsvp_status: 'yes', guest_count: 1, message: '' });
     const [loading, setLoading] = useState(false);
@@ -54,15 +52,20 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const ok = await submitGuest({
-            invitation_id: invitationId,
-            name: form.name,
-            rsvp_status: form.rsvp_status as 'yes' | 'no' | 'maybe',
-            guest_count: form.guest_count,
-            message: form.message || undefined,
-        });
-        setLoading(false);
-        if (ok) setSuccess(true);
+        try {
+            await submitGuest({
+                invitation_id: invitationId,
+                name: form.name,
+                rsvp_status: form.rsvp_status as 'yes' | 'no' | 'maybe',
+                guest_count: form.guest_count,
+                message: form.message || undefined,
+            });
+            setSuccess(true);
+        } catch {
+            alert('Қате орын алды. Қайта тырысыңыз.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (success) {
@@ -80,8 +83,7 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
             <div>
                 <label className="block text-sm font-medium text-foreground-700 mb-1.5">Атыңыз</label>
                 <input
-                    required
-                    value={form.name}
+                    required value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl border border-background-200 bg-background-50 text-foreground-900 focus:outline-none focus:border-accent-400 transition-colors"
                     placeholder="Есіміңізді енгізіңіз"
@@ -92,14 +94,10 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
                 <div className="flex gap-2">
                     {[['yes', '✅ Иә'], ['no', '❌ Жоқ'], ['maybe', '🤔 Мүмкін']].map(([val, label]) => (
                         <button
-                            key={val}
-                            type="button"
+                            key={val} type="button"
                             onClick={() => setForm({ ...form, rsvp_status: val })}
-                            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                                form.rsvp_status === val
-                                    ? 'bg-accent-500 text-white'
-                                    : 'bg-background-100 text-foreground-700 hover:bg-background-200'
-                            }`}
+                            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${form.rsvp_status === val ? 'bg-accent-500 text-white' : 'bg-background-100 text-foreground-700 hover:bg-background-200'
+                                }`}
                         >
                             {label}
                         </button>
@@ -109,10 +107,7 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
             <div>
                 <label className="block text-sm font-medium text-foreground-700 mb-1.5">Қонақтар саны</label>
                 <input
-                    type="number"
-                    min={1}
-                    max={20}
-                    value={form.guest_count}
+                    type="number" min={1} max={20} value={form.guest_count}
                     onChange={(e) => setForm({ ...form, guest_count: parseInt(e.target.value) || 1 })}
                     className="w-full px-4 py-3 rounded-xl border border-background-200 bg-background-50 text-foreground-900 focus:outline-none focus:border-accent-400 transition-colors"
                 />
@@ -128,8 +123,7 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
                 />
             </div>
             <button
-                type="submit"
-                disabled={loading}
+                type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl bg-accent-500 text-white font-semibold hover:bg-accent-600 transition-colors disabled:opacity-60"
             >
                 {loading ? 'Жіберілуде...' : 'Жауап жіберу'}
@@ -138,15 +132,14 @@ function RSVPForm({ invitationId }: { invitationId: number }) {
     );
 }
 
-// ── Guest Wishes ───────────────────────────────────────────────────────────────
-function GuestWishes({ guests }: { guests: DBGuest[] }) {
+function GuestWishes({ guests }: { guests: Guest[] }) {
     const withMessages = guests.filter((g) => g.message);
     if (withMessages.length === 0) return null;
 
     const col1 = withMessages.filter((_, i) => i % 2 === 0);
     const col2 = withMessages.filter((_, i) => i % 2 === 1);
 
-    const WishCard = ({ guest }: { guest: DBGuest }) => (
+    const WishCard = ({ guest }: { guest: Guest }) => (
         <div className="bg-background-50 border border-background-200 rounded-xl p-4 mb-4">
             <p className="text-foreground-700 text-sm leading-relaxed italic mb-3">"{guest.message}"</p>
             <div className="flex items-center gap-2">
@@ -166,35 +159,31 @@ function GuestWishes({ guests }: { guests: DBGuest[] }) {
     );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function InvitationPage() {
     const { slug } = useParams<{ slug: string }>();
-    const [invitation, setInvitation] = useState<DBInvitation | null>(null);
-    const [guests, setGuests] = useState<DBGuest[]>([]);
+    const [invitation, setInvitation] = useState<InvitationPublic | null>(null);
+    const [guests, setGuests] = useState<Guest[]>([]);
     const [loading, setLoading] = useState(true);
     const [audioPlaying, setAudioPlaying] = useState(false);
-    const audioRef = useState<HTMLAudioElement | null>(null);
+    const audioRef = { current: null as HTMLAudioElement | null };
 
     useEffect(() => {
         if (!slug) return;
-        Promise.all([getInvitation(slug), getInvitationGuests(0)]).then(([inv]) => {
-            setInvitation(inv);
-            if (inv) getInvitationGuests(inv.id).then(setGuests);
-            setLoading(false);
-        });
+        getInvitation(slug)
+            .then((inv) => {
+                setInvitation(inv);
+                if (inv) return getGuests(inv.id).then(setGuests);
+            })
+            .catch(() => setInvitation(null))
+            .finally(() => setLoading(false));
     }, [slug]);
 
     useEffect(() => {
         if (!invitation) return;
-        document.title = `${invitation.owner_name} — ${invitation.event_type} | Toyga.kz`;
-        // OG tags
-        const setMeta = (name: string, content: string) => {
-            let el = document.querySelector(`meta[property="${name}"]`) as HTMLMetaElement | null;
-            if (!el) {
-                el = document.createElement('meta');
-                el.setAttribute('property', name);
-                document.head.appendChild(el);
-            }
+        document.title = `${invitation.owner_name} — ${invitation.event_type} | Toyga`;
+        const setMeta = (property: string, content: string) => {
+            let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+            if (!el) { el = document.createElement('meta'); el.setAttribute('property', property); document.head.appendChild(el); }
             el.setAttribute('content', content);
         };
         setMeta('og:title', `${invitation.owner_name} — ${invitation.event_type}`);
@@ -203,13 +192,9 @@ export default function InvitationPage() {
     }, [invitation]);
 
     const toggleAudio = () => {
-        const audio = audioRef[0] as HTMLAudioElement | null;
+        const audio = audioRef.current;
         if (!audio) return;
-        if (audioPlaying) {
-            audio.pause();
-        } else {
-            audio.play();
-        }
+        audioPlaying ? audio.pause() : audio.play();
         setAudioPlaying(!audioPlaying);
     };
 
@@ -233,18 +218,13 @@ export default function InvitationPage() {
         );
     }
 
-    const eventDateFormatted = new Date(invitation.event_date).toLocaleDateString('kk-KZ', {
-        year: 'numeric', month: 'long', day: 'numeric',
-    });
-    const eventTimeFormatted = new Date(invitation.event_date).toLocaleTimeString('kk-KZ', {
-        hour: '2-digit', minute: '2-digit',
-    });
-
+    const eventDateFormatted = new Date(invitation.event_date).toLocaleDateString('kk-KZ', { year: 'numeric', month: 'long', day: 'numeric' });
+    const eventTimeFormatted = new Date(invitation.event_date).toLocaleTimeString('kk-KZ', { hour: '2-digit', minute: '2-digit' });
     const cd = invitation.custom_data ?? {};
 
     return (
         <div className="min-h-screen bg-background-100 font-body">
-            {/* ── 1. Cover ── */}
+            {/* Cover */}
             <section
                 className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 overflow-hidden"
                 style={{
@@ -255,23 +235,12 @@ export default function InvitationPage() {
             >
                 <div className="absolute inset-0 bg-black/50" />
                 <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-                    <p className="text-white/80 text-sm uppercase tracking-[0.3em] font-label">
-                        {invitation.event_type}
-                    </p>
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white font-heading leading-tight">
-                        {invitation.owner_name}
-                    </h1>
-                    <p className="text-white/90 text-xl sm:text-2xl font-heading">
-                        {eventDateFormatted}
-                    </p>
-                    {cd.dressCode && (
-                        <p className="text-white/70 text-sm">Dress code: {cd.dressCode}</p>
-                    )}
-                    <div className="pt-4">
-                        <Countdown eventDate={invitation.event_date} />
-                    </div>
+                    <p className="text-white/80 text-sm uppercase tracking-[0.3em] font-label">{invitation.event_type}</p>
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white font-heading leading-tight">{invitation.owner_name}</h1>
+                    <p className="text-white/90 text-xl sm:text-2xl font-heading">{eventDateFormatted}</p>
+                    {cd.dressCode && <p className="text-white/70 text-sm">Dress code: {cd.dressCode}</p>}
+                    <div className="pt-4"><Countdown eventDate={invitation.event_date} /></div>
                 </div>
-                {/* Scroll hint */}
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
                     <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -279,7 +248,7 @@ export default function InvitationPage() {
                 </div>
             </section>
 
-            {/* ── 2. Description ── */}
+            {/* Description */}
             {cd.description && (
                 <section className="max-w-2xl mx-auto px-4 py-16 text-center">
                     <div className="flex items-center justify-center gap-4 mb-6">
@@ -291,7 +260,7 @@ export default function InvitationPage() {
                 </section>
             )}
 
-            {/* ── 3. Details ── */}
+            {/* Details */}
             <section className="max-w-2xl mx-auto px-4 py-12">
                 <div className="bg-background-50 rounded-2xl border border-background-200 p-6 sm:p-8 space-y-6">
                     <h2 className="text-2xl font-bold font-heading text-foreground-900 text-center">Той мәліметтері</h2>
@@ -326,54 +295,38 @@ export default function InvitationPage() {
                 </div>
             </section>
 
-            {/* ── 4. Map ── */}
+            {/* Map */}
             {invitation.event_lat && invitation.event_lng && (
                 <section className="max-w-2xl mx-auto px-4 pb-12">
                     <div className="rounded-2xl overflow-hidden border border-background-200 h-64">
                         <iframe
-                            title="Той орны"
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            loading="lazy"
+                            title="Той орны" width="100%" height="100%" style={{ border: 0 }} loading="lazy"
                             src={`https://www.google.com/maps?q=${invitation.event_lat},${invitation.event_lng}&z=15&output=embed`}
                         />
                     </div>
                 </section>
             )}
 
-            {/* ── 5. Audio ── */}
+            {/* Audio */}
             {invitation.audio_url && (
                 <section className="max-w-2xl mx-auto px-4 pb-12">
                     <div className="bg-background-50 rounded-2xl border border-background-200 p-6 flex items-center gap-4">
-                        <button
-                            onClick={toggleAudio}
-                            className="w-14 h-14 rounded-full bg-accent-500 text-white flex items-center justify-center shrink-0 hover:bg-accent-600 transition-colors"
-                        >
-                            {audioPlaying ? (
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                                </svg>
-                            ) : (
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            )}
+                        <button onClick={toggleAudio} className="w-14 h-14 rounded-full bg-accent-500 text-white flex items-center justify-center shrink-0 hover:bg-accent-600 transition-colors">
+                            {audioPlaying
+                                ? <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
+                                : <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                            }
                         </button>
                         <div>
                             <p className="font-semibold text-foreground-900">Той музыкасы</p>
                             <p className="text-sm text-foreground-500">Ойнату үшін басыңыз</p>
                         </div>
-                        <audio
-                            ref={(el) => { (audioRef as React.MutableRefObject<HTMLAudioElement | null>).current = el; }}
-                            src={invitation.audio_url}
-                            onEnded={() => setAudioPlaying(false)}
-                        />
+                        <audio ref={(el) => { audioRef.current = el; }} src={invitation.audio_url} onEnded={() => setAudioPlaying(false)} />
                     </div>
                 </section>
             )}
 
-            {/* ── 6. Guest Wishes ── */}
+            {/* Guest wishes */}
             {guests.filter(g => g.message).length > 0 && (
                 <section className="max-w-2xl mx-auto px-4 pb-12">
                     <div className="flex items-center justify-center gap-4 mb-8">
@@ -385,7 +338,7 @@ export default function InvitationPage() {
                 </section>
             )}
 
-            {/* ── 7. RSVP ── */}
+            {/* RSVP */}
             <section className="max-w-2xl mx-auto px-4 pb-20">
                 <div className="bg-background-50 rounded-2xl border border-background-200 p-6 sm:p-8">
                     <div className="text-center mb-8">
@@ -396,14 +349,11 @@ export default function InvitationPage() {
                 </div>
             </section>
 
-            {/* Footer */}
             <footer className="text-center py-6 border-t border-background-200">
                 <p className="text-foreground-500 text-sm">
                     Шақыру{' '}
-                    <Link to="/" className="text-accent-600 hover:underline font-medium">
-                        Toyga.kz
-                    </Link>{' '}
-                    арқылы жасалған
+                    <Link to="/" className="text-accent-600 hover:underline font-medium">Toyga</Link>
+                    {' '}арқылы жасалған
                 </p>
             </footer>
         </div>
