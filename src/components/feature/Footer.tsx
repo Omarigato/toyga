@@ -1,79 +1,78 @@
 import { Link } from 'react-router-dom';
+
+const footerLinks = [
+    { label: 'Той жайлы', href: '/blog' },
+    { label: 'Шақыру үлгілері', href: '/tandau' },
+    { label: 'Сурет шақырулар', href: '/suret' },
+    { label: 'Той әндері', href: '/musics' },
+];
+
 export default function Footer() {
     return (
-        <footer className="w-full bg-foreground-900 text-background-100">
-            {/* Footer top */}
-            <div className="w-full px-4 md:px-6 lg:px-8 py-10 md:py-12 border-b border-foreground-700/40">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 items-start">
-                    {/* Logo */}
+        <footer className="w-full bg-foreground-950 text-background-50 py-12 md:py-16">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 pb-10 border-b border-foreground-800">
+                    {/* Brand */}
                     <div>
-                        <Link to="/" className="inline-flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-lg bg-accent-500 flex items-center justify-center">
-                                <i className="ri-mail-send-line text-background-50 text-lg" />
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-9 h-9 rounded-lg bg-accent-500 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
                             </div>
-                            <div className="flex flex-col leading-none">
-                                <span className="text-xl font-bold text-background-50 font-heading tracking-tight">shaqyru</span>
-                                <span className="text-[10px] text-background-300 uppercase tracking-wider font-label">онлайн конструктор</span>
-                            </div>
-                        </Link>
-                    </div>
-                    {/* Address */}
-                    <div className="flex items-start gap-3">
-                        <div className="w-5 h-5 flex items-center justify-center mt-0.5 shrink-0">
-                            <i className="ri-map-pin-line text-accent-400" />
+                            <span className="text-lg font-bold font-heading">Toyga.kz</span>
                         </div>
-                        <span className="text-sm text-background-200">Қазақстан бойынша</span>
-                    </div>
-                    {/* Phone */}
-                    <div>
+                        <p className="text-background-400 text-sm leading-relaxed max-w-xs">
+                            Тойыңызға арналған керемет онлайн шақырулар. Тез, оңай және сапалы.
+                        </p>
                         <a
-                            href="tel:+77066403655"
+                            href="https://api.whatsapp.com/send?phone=77066403655"
+                            target="_blank"
                             rel="nofollow"
-                            className="flex items-center gap-3 text-sm text-background-200 hover:text-accent-400 transition-colors"
+                            className="inline-flex items-center gap-2 mt-4 text-sm text-accent-400 hover:text-accent-300 transition-colors"
                         >
-                            <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                                <i className="ri-phone-line text-accent-400" />
-                            </div>
                             +7 706 640-36-55
                         </a>
                     </div>
-                </div>
-            </div>
-            {/* Footer bottom */}
-            <div className="w-full px-4 md:px-6 lg:px-8 py-6">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-background-400 text-center sm:text-left">
-                        &copy;2026. Барлық құқықтар қорғалған
-                    </p>
-                    <div className="flex items-center gap-4">
+
+                    {/* Links */}
+                    <div>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider text-background-400 mb-4">Беттер</h3>
+                        <ul className="space-y-3">
+                            {footerLinks.map((link) => (
+                                <li key={link.href}>
+                                    <Link to={link.href} className="text-sm text-background-300 hover:text-white transition-colors">
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* CTA */}
+                    <div>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider text-background-400 mb-4">Тапсырыс беру</h3>
+                        <p className="text-sm text-background-400 mb-4">
+                            WhatsApp арқылы тапсырыс беріңіз — 5 минутта дайын!
+                        </p>
                         <a
-                            href="https://www.instagram.com/shaqyru.kz_"
-                            rel="nofollow"
+                            href="https://api.whatsapp.com/send?phone=77066403655&text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5!"
                             target="_blank"
-                            className="w-9 h-9 flex items-center justify-center rounded-full bg-foreground-800 hover:bg-accent-500 transition-colors"
-                            aria-label="Instagram"
-                        >
-                            <i className="ri-instagram-line text-background-200" />
-                        </a>
-                        <a
-                            href="https://www.tiktok.com/@shaqyru.kz"
                             rel="nofollow"
-                            target="_blank"
-                            className="w-9 h-9 flex items-center justify-center rounded-full bg-foreground-800 hover:bg-accent-500 transition-colors"
-                            aria-label="TikTok"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent-500 text-white text-sm font-medium hover:bg-accent-600 transition-colors"
                         >
-                            <i className="ri-tiktok-line text-background-200" />
-                        </a>
-                        <a
-                            href="https://t.me/shaqyrukz_bot"
-                            rel="nofollow"
-                            target="_blank"
-                            className="w-9 h-9 flex items-center justify-center rounded-full bg-foreground-800 hover:bg-accent-500 transition-colors"
-                            aria-label="Telegram"
-                        >
-                            <i className="ri-telegram-line text-background-200" />
+                            WhatsApp-та жазыңыз
                         </a>
                     </div>
+                </div>
+
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-background-500 text-xs">
+                        © {new Date().getFullYear()} Toyga.kz — Барлық құқықтар қорғалған.
+                    </p>
+                    <Link to="/admin" className="text-background-600 hover:text-background-400 text-xs transition-colors">
+                        Админ
+                    </Link>
                 </div>
             </div>
         </footer>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { photoTemplates, whatsappNumber } from '@/mocks/homeData';
+import { photoTemplates, WHATSAPP_NUMBER } from '@/mocks/homeData';
+
 export default function PhotoTemplatesSection() {
     return (
         <section className="w-full bg-background-50 py-12 md:py-16 lg:py-20">
@@ -9,7 +10,7 @@ export default function PhotoTemplatesSection() {
                     <div className="flex items-center justify-center gap-4 mb-4">
                         <div className="h-px w-12 md:w-20 bg-accent-300" />
                         <span className="text-sm font-medium text-accent-600 uppercase tracking-wider font-label">
-                            Фото шақырулар
+                            Шақыру үлгілері
                         </span>
                         <div className="h-px w-12 md:w-20 bg-accent-300" />
                     </div>
@@ -27,13 +28,18 @@ export default function PhotoTemplatesSection() {
                             {/* Image */}
                             <div className="relative w-full aspect-[4/5] overflow-hidden bg-background-100">
                                 <img
-                                    src={template.image}
+                                    src={template.preview_image_url}
                                     alt={template.title}
                                     width="400"
                                     height="500"
                                     className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                                     loading="lazy"
                                 />
+                                {template.is_free && (
+                                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent-500 text-white text-xs font-semibold">
+                                        Тегін
+                                    </span>
+                                )}
                             </div>
                             {/* Content */}
                             <div className="flex flex-col gap-3 p-4 md:p-5">
@@ -45,11 +51,11 @@ export default function PhotoTemplatesSection() {
                                         {template.price}
                                     </span>
                                     <span className="text-xs text-foreground-600">
-                                        {template.extraPrice}
+                                        {template.extra_price}
                                     </span>
                                 </div>
                                 <a
-                                    href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(template.whatsappText)}`}
+                                    href={`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(template.whatsapp_text)}`}
                                     rel="nofollow"
                                     target="_blank"
                                     className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-secondary-500 text-background-50 text-sm font-semibold hover:bg-secondary-600 transition-colors whitespace-nowrap mt-1"
@@ -63,7 +69,7 @@ export default function PhotoTemplatesSection() {
                 {/* View all button */}
                 <div className="flex justify-center mt-10 md:mt-12">
                     <Link
-                        to="/suret"
+                        to="/tandau"
                         className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary-500 text-background-50 text-base font-semibold hover:bg-primary-600 transition-all duration-300 hover:shadow-lg whitespace-nowrap"
                     >
                         <span className="text-lg">🎉</span>

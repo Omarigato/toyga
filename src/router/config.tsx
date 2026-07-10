@@ -1,39 +1,28 @@
 import type { RouteObject } from "react-router-dom";
+import { lazy } from "react";
 import NotFound from "../pages/NotFound";
-import Home from "../pages/home/page";
-import Tandau from "../pages/tandau/page";
-import Suret from "../pages/suret/page";
-import Blog from "../pages/blog/page";
-import BlogDetail from "../pages/blogDetail/page";
-import Musics from "../pages/musics/page";
+
+const Home = lazy(() => import("../pages/home/page"));
+const Tandau = lazy(() => import("../pages/tandau/page"));
+const Suret = lazy(() => import("../pages/suret/page"));
+const Blog = lazy(() => import("../pages/blog/page"));
+const BlogDetail = lazy(() => import("../pages/blogDetail/page"));
+const Musics = lazy(() => import("../pages/musics/page"));
+const InvitationPage = lazy(() => import("../pages/invitation/page"));
+const AdminLoginPage = lazy(() => import("../pages/admin/LoginPage"));
+const AdminDashboardPage = lazy(() => import("../pages/admin/DashboardPage"));
+
 const routes: RouteObject[] = [
-    {
-        path: "/",
-        element: <Home />,
-    },
-    {
-        path: "/tandau",
-        element: <Tandau />,
-    },
-    {
-        path: "/suret",
-        element: <Suret />,
-    },
-    {
-        path: "/blog",
-        element: <Blog />,
-    },
-    {
-        path: "/blog/:slug",
-        element: <BlogDetail />,
-    },
-    {
-        path: "/musics",
-        element: <Musics />,
-    },
-    {
-        path: "*",
-        element: <NotFound />,
-    },
+    { path: "/", element: <Home /> },
+    { path: "/tandau", element: <Tandau /> },
+    { path: "/suret", element: <Suret /> },
+    { path: "/blog", element: <Blog /> },
+    { path: "/blog/:slug", element: <BlogDetail /> },
+    { path: "/musics", element: <Musics /> },
+    { path: "/i/:slug", element: <InvitationPage /> },
+    { path: "/admin/login", element: <AdminLoginPage /> },
+    { path: "/admin", element: <AdminDashboardPage /> },
+    { path: "*", element: <NotFound /> },
 ];
+
 export default routes;

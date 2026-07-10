@@ -22,7 +22,7 @@ export default function CategoriesSection() {
                     {invitationCategories.map((category) => (
                         <Link
                             key={category.id}
-                            to={category.href}
+                            to={`/tandau?category=${category.slug}`}
                             className="group relative overflow-hidden rounded-xl aspect-[3/1] md:aspect-[3.5/1] block"
                         >
                             {/* Background image */}
