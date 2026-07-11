@@ -9,6 +9,8 @@ const Blog = lazy(() => import("../pages/blog/page"));
 const BlogDetail = lazy(() => import("../pages/blogDetail/page"));
 const Musics = lazy(() => import("../pages/musics/page"));
 const InvitationPage = lazy(() => import("../pages/invitation/page"));
+const UserAuthPage = lazy(() => import("../pages/auth/UserAuthPage"));
+const AppTemplates = lazy(() => import("../pages/app/templates"));
 const AdminLoginPage = lazy(() => import("../pages/admin/LoginPage"));
 const AdminDashboardPage = lazy(() => import("../pages/admin/DashboardPage"));
 
@@ -20,7 +22,9 @@ const routes: RouteObject[] = [
     { path: "/blog/:slug", element: <BlogDetail /> },
     { path: "/musics", element: <Musics /> },
     { path: "/i/:slug", element: <InvitationPage /> },
-    { path: "/login", element: <AdminLoginPage /> },
+    { path: "/login", element: <UserAuthPage /> },
+    { path: "/register", element: <UserAuthPage /> },
+    { path: "/app/templates", element: <AppTemplates /> },
     { path: "/admin/login", element: <AdminLoginPage /> },
     { path: "/admin", element: <AdminDashboardPage /> },
     { path: "*", element: <NotFound /> },

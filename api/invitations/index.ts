@@ -1,52 +1,63 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { pool } from '../_db';
-import { requireAuth } from '../_auth';
+import type { VercelResponse } from '@vercel/node';
+import { withHandler, requireAdmin } from '../_core';
+import { eventService } from '../../src/core/factories';
+import { z } from 'zod';
+import { ValidationError } from '../_core/errors';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default withHandler(
+  async (req, res: VercelResponse) => {
+    // ─── GET: List all invitations (admin) ───────────────────────────────────
     if (req.method === 'GET') {
-        if (!requireAuth(req, res)) return;
-
-        try {
-            const { rows } = await pool.query(`
-                SELECT i.*, t.title as template_title 
-                FROM invitations i
-                LEFT JOIN templates t ON i.template_id = t.id
-                ORDER BY i.created_at DESC
-            `);
-            return res.status(200).json(rows);
-        } catch (err) {
-            console.error('[/api/invitations GET]', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
+      requireAdmin(req);
+      const events = await eventService.listAllEvents();
+      res.status(200).json(events);
+      return;
     }
 
+    // ─── POST: Create Invitation (Admin / User) ──────────────────────────────
     if (req.method === 'POST') {
-        if (!requireAuth(req, res)) return;
+      const userId = req.ctx.userId || req.ctx.adminId;
+      if (!userId) {
+        throw new ValidationError('Authentication required');
+      }
 
-        const {
-            template_id, short_slug, owner_name, owner_phone, event_type,
-            event_date, event_location, event_lat, event_lng,
-            cover_image_url, audio_url, custom_data
-        } = req.body;
+      const schema = z.object({
+        template_id: z.number().int().positive().optional(),
+        short_slug: z.string().min(2).max(100),
+        owner_name: z.string().min(1),
+        owner_phone: z.string().optional(),
+        event_type: z.string(),
+        event_date: z.string(),
+        event_location: z.string().optional(),
+        event_lat: z.number().optional(),
+        event_lng: z.number().optional(),
+        audio_url: z.string().optional(),
+        custom_data: z.record(z.string(), z.unknown()).optional(),
+      });
 
-        try {
-            const { rows } = await pool.query(
-                `INSERT INTO invitations (
-                    template_id, short_slug, owner_name, owner_phone, event_type,
-                    event_date, event_location, event_lat, event_lng,
-                    cover_image_url, audio_url, custom_data, status
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'published')
-                RETURNING *`,
-                [template_id, short_slug, owner_name, owner_phone, event_type,
-                 event_date, event_location, event_lat, event_lng,
-                 cover_image_url, audio_url, custom_data || {}]
-            );
-            return res.status(201).json(rows[0]);
-        } catch (err) {
-            console.error('[/api/invitations POST]', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
+      const body = schema.parse(req.body);
+
+      const event = await eventService.createEvent({
+        userId,
+        templateId: body.template_id,
+        slug: body.short_slug,
+        ownerName: body.owner_name,
+        ownerPhone: body.owner_phone,
+        type: body.event_type,
+        eventDate: body.event_date,
+        audioUrl: body.audio_url,
+        location: body.event_location,
+        lat: body.event_lat,
+        lng: body.event_lng,
+        customData: body.custom_data,
+      });
+
+      res.status(201).json(event);
+      return;
     }
-
-    return res.status(405).json({ error: 'Method not allowed' });
-}
+  },
+  {
+    methods: ['GET', 'POST'],
+    auth: 'any',
+  }
+);

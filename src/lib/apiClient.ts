@@ -89,6 +89,46 @@ export function createOrder(data: {
     });
 }
 
+// ─── User Auth API ───────────────────────────────────────────────────────────
+
+export function userOtpRequest(phone: string, purpose: 'login' | 'register' = 'login') {
+    return apiFetch<{ success: boolean }>('/auth/otp-request', {
+        method: 'POST',
+        body: JSON.stringify({ phone, purpose }),
+    });
+}
+
+export function userOtpVerify(phone: string, code: string, name?: string) {
+    return apiFetch<{ success: boolean; user: any }>('/auth/otp-verify', {
+        method: 'POST',
+        body: JSON.stringify({ phone, code, name }),
+    });
+}
+
+export function userLogin(data: any) {
+    return apiFetch<{ success: boolean; user: any }>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+export function userRegister(data: any) {
+    return apiFetch<{ success: boolean; user: any }>('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+export function userGetMe() {
+    return apiFetch<{ success: boolean; user: any }>('/auth/me');
+}
+
+export function userLogout() {
+    return apiFetch<{ success: boolean }>('/auth/logout', {
+        method: 'POST',
+    });
+}
+
 // ─── Admin API ────────────────────────────────────────────────────────────────
 
 export function adminLogin(email: string, password: string) {
