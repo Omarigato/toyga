@@ -1,34 +1,49 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { pool } from '../_db';
+import type { VercelResponse } from '@vercel/node';
+import { withHandler } from '../_core';
+import { surveyService } from '../../src/core/factories';
+import { z } from 'zod';
+import { ValidationError } from '../_core/errors';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default withHandler(
+  async (req, res: VercelResponse) => {
     const { invitationId } = req.query;
+    const eventId = z.coerce.number().int().positive().safeParse(invitationId);
 
+    if (!eventId.success) {
+      throw new ValidationError('Invalid invitation id parameter.');
+    }
+
+    // ─── GET: List Guests/RSVP for Event ─────────────────────────────────────
     if (req.method === 'GET') {
-        try {
-            const { rows } = await pool.query(
-                'SELECT * FROM guests WHERE invitation_id = $1 ORDER BY created_at DESC',
-                [invitationId]
-            );
-            return res.status(200).json(rows);
-        } catch (err) {
-            return res.status(500).json({ error: 'Internal server error' });
-        }
+      const surveys = await surveyService.listSurveysForEvent(eventId.data);
+      res.status(200).json(surveys);
+      return;
     }
 
+    // ─── POST: Submit Guest RSVP Survey ──────────────────────────────────────
     if (req.method === 'POST') {
-        const { name, rsvp_status, guest_count, message } = req.body;
-        try {
-            await pool.query(
-                `INSERT INTO guests (invitation_id, name, rsvp_status, guest_count, message)
-                 VALUES ($1, $2, $3, $4, $5)`,
-                [invitationId, name, rsvp_status, guest_count, message]
-            );
-            return res.status(201).json({ success: true });
-        } catch (err) {
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-    }
+      const schema = z.object({
+        name: z.string().min(1).max(200),
+        rsvp_status: z.enum(['yes', 'no', 'maybe']),
+        guest_count: z.number().int().min(1).max(20).default(1),
+        message: z.string().max(1000).optional().nullable(),
+      });
 
-    return res.status(405).json({ error: 'Method not allowed' });
-}
+      const body = schema.parse(req.body);
+
+      await surveyService.submitSurvey({
+        eventId: eventId.data,
+        name: body.name,
+        status: body.rsvp_status,
+        guestCount: body.guest_count,
+        message: body.message,
+      });
+
+      res.status(201).json({ success: true });
+      return;
+    }
+  },
+  {
+    methods: ['GET', 'POST'],
+  }
+);

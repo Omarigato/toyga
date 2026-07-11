@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import formidable from 'formidable';
 import fs from 'fs';
-import { requireAuth } from '../_auth';
-import { drive, getFolderId, MediaFolder } from '../_drive';
+import { requireAuth } from './_auth';
+import { drive, getFolderId, MediaFolder } from './_drive';
 
 // Disable default Vercel body parser to allow formidable to stream the multipart body
 export const config = {
