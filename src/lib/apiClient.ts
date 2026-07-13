@@ -46,17 +46,34 @@ export function getCategories() {
     return apiFetch<Category[]>('/categories');
 }
 
+function mapTemplate(t: any): Template {
+    return {
+        id: parseInt(t.id),
+        category_id: t.category_id ? parseInt(t.category_id) : 0,
+        category_slug: t.category_slug,
+        category_title: t.category_title,
+        title: t.title_kk || '',
+        description: t.title_ru || '',
+        price: parseInt(t.price || '0'),
+        extra_price: 400,
+        preview_image_url: t.preview_img || '',
+        is_free: parseInt(t.price || '0') === 0,
+        is_active: !!t.is_active,
+        sort_order: parseInt(t.sort_order || '0')
+    };
+}
+
 export function getTemplates(categorySlug?: string) {
     const qs = categorySlug ? `?category=${categorySlug}` : '';
-    return apiFetch<Template[]>(`/templates${qs}`);
+    return apiFetch<any[]>(`/templates${qs}`).then((list) => list.map(mapTemplate));
 }
 
 export function getTemplateById(id: number) {
-    return apiFetch<Template>(`/templates/${id}`);
+    return apiFetch<any>(`/templates/${id}`).then(mapTemplate);
 }
 
 export function getInvitation(slug: string) {
-    return apiFetch<InvitationPublic>(`/invitations/${slug}`);
+    return apiFetch<InvitationPublic>(`/events/${slug}`);
 }
 
 export function getGuests(invitationId: number) {
@@ -86,6 +103,82 @@ export function createOrder(data: {
     return apiFetch<{ success: true }>('/orders', {
         method: 'POST',
         body: JSON.stringify(data),
+    });
+}
+
+// ─── User Events, Guests & Media API ──────────────────────────────────────────
+
+export function getUserEvents() {
+    return apiFetch<any[]>('/events');
+}
+
+export function createEvent(data: any) {
+    return apiFetch<any>('/events', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+export function updateEvent(id: number, data: any) {
+    return apiFetch<any>(`/events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+}
+
+export function getEventById(id: number) {
+    return apiFetch<any>(`/events/${id}`);
+}
+
+export function getInvitationLayout(eventId: number) {
+    return apiFetch<{ content: any; rendered_image_url: string | null }>(`/events/${eventId}/invitation`);
+}
+
+export function saveInvitationLayout(eventId: number, data: { content: any; rendered_image_data?: string }) {
+    return apiFetch<any>(`/events/${eventId}/invitation`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+}
+
+export function getEventGuests(eventId: number) {
+    return apiFetch<any[]>(`/events/${eventId}/guests`);
+}
+
+export function addEventGuest(eventId: number, data: { full_name: string; phone: string; greeting_text?: string }) {
+    return apiFetch<any>(`/events/${eventId}/guests`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+export function importEventGuests(eventId: number, list: Array<{ full_name: string; phone: string; greeting_text?: string }>) {
+    return apiFetch<any[]>(`/events/${eventId}/guests/import`, {
+        method: 'POST',
+        body: JSON.stringify(list),
+    });
+}
+
+export function deleteGuestContact(guestId: number) {
+    return apiFetch<{ success: true }>(`/guests/${guestId}`, {
+        method: 'DELETE',
+    });
+}
+
+export function getEventMedia(eventId: number) {
+    return apiFetch<any[]>(`/events/${eventId}/media`);
+}
+
+export function addEventMedia(eventId: number, data: { url: string; type: 'image' | 'video'; sort_order?: number }) {
+    return apiFetch<any>(`/events/${eventId}/media`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+export function deleteEventMedia(eventId: number, mediaId: number) {
+    return apiFetch<{ success: true }>(`/events/${eventId}/media?mediaId=${mediaId}`, {
+        method: 'DELETE',
     });
 }
 
@@ -138,19 +231,12 @@ export function adminLogin(email: string, password: string) {
     });
 }
 
-export function adminTokenLogin(token: string) {
-    return apiFetch<{ ok: true }>('/admin/login', {
-        method: 'POST',
-        body: JSON.stringify({ token }),
-    });
-}
-
 export function adminLogout() {
-    return apiFetch<void>('/admin/me', { method: 'DELETE' });
+    return userLogout();
 }
 
 export function adminGetMe() {
-    return apiFetch<{ email: string }>('/admin/me');
+    return userGetMe();
 }
 
 export function adminGetOrders() {
@@ -165,31 +251,42 @@ export function adminUpdateOrderStatus(id: number, status: string) {
 }
 
 export function adminGetInvitations() {
-    return apiFetch<InvitationAdmin[]>('/invitations');
+    return apiFetch<InvitationAdmin[]>('/events');
 }
 
 export function adminCreateInvitation(data: CreateInvitationInput) {
-    return apiFetch<InvitationAdmin>('/invitations', {
+    return apiFetch<InvitationAdmin>('/events', {
         method: 'POST',
         body: JSON.stringify(data),
     });
 }
 
 export function adminGetAllTemplates() {
-    return apiFetch<Template[]>('/templates?all=true');
+    return apiFetch<any[]>('/templates?all=true').then((list) => list.map(mapTemplate));
 }
 
 export function adminUpsertTemplate(data: Partial<Template> & { id?: number }) {
+    const payload = {
+        category_id: data.category_id,
+        code: data.category_slug || data.title?.toLowerCase().replace(/\s+/g, '-'),
+        title_kk: data.title || '',
+        title_ru: data.description || '',
+        price: data.price,
+        is_premium: data.is_free === false,
+        is_active: data.is_active,
+        sort_order: data.sort_order,
+        preview_img: data.preview_image_url || '',
+    };
     if (data.id) {
-        return apiFetch<Template>(`/templates/${data.id}`, {
+        return apiFetch<any>(`/templates/${data.id}`, {
             method: 'PUT',
-            body: JSON.stringify(data),
-        });
+            body: JSON.stringify(payload),
+        }).then(mapTemplate);
     }
-    return apiFetch<Template>('/templates', {
+    return apiFetch<any>('/templates', {
         method: 'POST',
-        body: JSON.stringify(data),
-    });
+        body: JSON.stringify(payload),
+    }).then(mapTemplate);
 }
 
 export function adminGetCategories() {
@@ -197,15 +294,21 @@ export function adminGetCategories() {
 }
 
 export function adminUpsertCategory(data: Partial<Category> & { id?: number }) {
+    const payload = {
+        slug: data.slug,
+        title_kk: data.title_kk || '',
+        icon_url: data.image_url,
+        sort_order: data.sort_order
+    };
     if (data.id) {
         return apiFetch<Category>(`/categories?id=${data.id}`, {
             method: 'PUT',
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
     }
     return apiFetch<Category>('/categories', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
     });
 }
 

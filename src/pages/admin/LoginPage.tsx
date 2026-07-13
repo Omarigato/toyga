@@ -1,25 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { adminLogin, adminTokenLogin } from '@/lib/apiClient';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { adminLogin } from '@/lib/apiClient';
 
 export default function AdminLoginPage() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        const token = searchParams.get('token');
-        if (token) {
-            setLoading(true);
-            adminTokenLogin(token)
-                .then(() => navigate('/admin'))
-                .catch(() => setError('Токен қате немесе мерзімі біткен.'))
-                .finally(() => setLoading(false));
-        }
-    }, [searchParams, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

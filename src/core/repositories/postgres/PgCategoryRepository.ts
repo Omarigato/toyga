@@ -4,7 +4,7 @@ import { query } from '../../../../api/_core/db';
 
 export class PgCategoryRepository implements ICategoryRepository {
   async findAll(activeOnly = false): Promise<Category[]> {
-    let sql = 'SELECT id, slug, title_kk, icon_url, sort_order FROM categories WHERE deleted_at IS NULL';
+    let sql = 'SELECT id, slug, title_kk, icon_url as image_url, sort_order FROM categories WHERE deleted_at IS NULL';
     const params: any[] = [];
 
     if (activeOnly) {
@@ -19,7 +19,7 @@ export class PgCategoryRepository implements ICategoryRepository {
 
   async findById(id: number): Promise<Category | null> {
     const { rows } = await query<Category>(
-      'SELECT id, slug, title_kk, icon_url, sort_order FROM categories WHERE id = $1 AND deleted_at IS NULL LIMIT 1',
+      'SELECT id, slug, title_kk, icon_url as image_url, sort_order FROM categories WHERE id = $1 AND deleted_at IS NULL LIMIT 1',
       [id]
     );
     return rows[0] || null;
@@ -27,7 +27,7 @@ export class PgCategoryRepository implements ICategoryRepository {
 
   async findBySlug(slug: string): Promise<Category | null> {
     const { rows } = await query<Category>(
-      'SELECT id, slug, title_kk, icon_url, sort_order FROM categories WHERE slug = $1 AND deleted_at IS NULL LIMIT 1',
+      'SELECT id, slug, title_kk, icon_url as image_url, sort_order FROM categories WHERE slug = $1 AND deleted_at IS NULL LIMIT 1',
       [slug]
     );
     return rows[0] || null;

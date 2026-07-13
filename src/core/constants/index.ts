@@ -93,6 +93,8 @@ export enum RenderJobStatus {
 
 // ─── API & System Configuration ─────────────────────────────────────────────
 
+export const WHATSAPP_NUMBER = '77771335250';
+
 export const SYSTEM_LIMITS = {
   OTP_LENGTH: 6,
   OTP_EXPIRY_MINUTES: 5,

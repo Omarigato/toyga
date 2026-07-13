@@ -1,60 +1,50 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelResponse } from '@vercel/node';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { pool } from '../_db';
-import { setCookieHeader } from '../_auth';
+import { withHandler, query, createAdminToken, setTokenCookie } from '../_core';
+import { ValidationError } from '../_core/errors';
+import { z } from 'zod';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+const adminLoginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export default withHandler(
+  async (req, res: VercelResponse) => {
+    // Validate request parameters
+    const { email, password } = adminLoginSchema.parse(req.body);
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Query for existing admin
+    const { rows } = await query<{
+      id: string;
+      email: string;
+      password_hash: string;
+    }>(
+      'SELECT id, email, password_hash FROM admins WHERE email = $1 LIMIT 1',
+      [normalizedEmail]
+    );
+
+    const admin = rows[0];
+    if (!admin) {
+      throw new ValidationError('Invalid email or password.');
     }
 
-    const { email, password, token } = req.body as { email?: string; password?: string; token?: string };
-
-    if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ error: 'JWT_SECRET not configured' });
+    // Verify password
+    const valid = await bcrypt.compare(password, admin.password_hash);
+    if (!valid) {
+      throw new ValidationError('Invalid email or password.');
     }
 
-    if (token) {
-        try {
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
-            res.setHeader('Set-Cookie', setCookieHeader(token));
-            return res.status(200).json({ ok: true, payload });
-        } catch (err) {
-            return res.status(401).json({ error: 'Invalid or expired token' });
-        }
-    }
+    // Create session token
+    const token = createAdminToken(parseInt(admin.id), admin.email);
 
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password required' });
-    }
+    // Set cookie header
+    res.setHeader('Set-Cookie', setTokenCookie(token));
 
-    try {
-        const { rows } = await pool.query<{ id: number; email: string; password_hash: string }>(
-            'SELECT id, email, password_hash FROM admins WHERE email = $1 LIMIT 1',
-            [email.toLowerCase().trim()]
-        );
-
-        const admin = rows[0];
-        if (!admin) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        const valid = await bcrypt.compare(password, admin.password_hash);
-        if (!valid) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        const token = jwt.sign(
-            { adminId: admin.id, email: admin.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        res.setHeader('Set-Cookie', setCookieHeader(token));
-        return res.status(200).json({ ok: true });
-    } catch (err) {
-        console.error('[/api/admin/login]', err);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-}
+    res.status(200).json({ ok: true });
+  },
+  {
+    methods: ['POST'],
+  }
+);

@@ -1,8 +1,8 @@
 import type { VercelResponse } from '@vercel/node';
-import { withHandler } from '../_core';
+import { withHandler, query, authenticateUser } from '../_core';
 import { surveyService } from '../../src/core/factories';
 import { z } from 'zod';
-import { ValidationError } from '../_core/errors';
+import { ValidationError, NotFoundError, ForbiddenError } from '../_core/errors';
 
 export default withHandler(
   async (req, res: VercelResponse) => {
@@ -10,7 +10,7 @@ export default withHandler(
     const eventId = z.coerce.number().int().positive().safeParse(invitationId);
 
     if (!eventId.success) {
-      throw new ValidationError('Invalid invitation id parameter.');
+      throw new ValidationError('Invalid ID parameter.');
     }
 
     // ─── GET: List Guests/RSVP for Event ─────────────────────────────────────
@@ -42,8 +42,52 @@ export default withHandler(
       res.status(201).json({ success: true });
       return;
     }
+
+    // ─── DELETE: Remove Guest Contact ────────────────────────────────────────
+    if (req.method === 'DELETE') {
+      const guestId = eventId.data;
+
+      // Extract authentication context manually
+      const ctx = authenticateUser(req);
+
+      // Verify guest contact exists
+      const { rows: guestRows } = await query<{ event_id: string }>(
+        'SELECT event_id FROM guest_contacts WHERE id = $1 AND deleted_at IS NULL',
+        [guestId]
+      );
+
+      if (guestRows.length === 0) {
+        throw new NotFoundError('Guest contact');
+      }
+
+      const guestEventId = parseInt(guestRows[0].event_id);
+
+      // Verify event ownership
+      const { rows: eventRows } = await query<{ user_id: string }>(
+        'SELECT user_id FROM events WHERE id = $1 AND deleted_at IS NULL',
+        [guestEventId]
+      );
+
+      if (eventRows.length === 0) {
+        throw new NotFoundError('Event');
+      }
+
+      const ownerId = parseInt(eventRows[0].user_id);
+      if (ctx.role !== 'admin' && ownerId !== ctx.userId) {
+        throw new ForbiddenError('You do not own the event associated with this guest');
+      }
+
+      // Soft delete guest contact
+      await query(
+        'UPDATE guest_contacts SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1',
+        [guestId]
+      );
+
+      res.status(200).json({ success: true });
+      return;
+    }
   },
   {
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'DELETE'],
   }
 );

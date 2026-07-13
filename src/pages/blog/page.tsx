@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/feature/Navbar';
 import Footer from '@/components/feature/Footer';
-import { blogArticles } from '@/mocks/homeData';
+import { blogArticles } from '@/core/constants/blogData';
 export default function Blog() {
     return (
         <div className="flex flex-col min-h-screen">

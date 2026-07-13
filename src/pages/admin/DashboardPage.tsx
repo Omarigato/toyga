@@ -238,7 +238,7 @@ function InvitationsTab() {
 
         try {
             await adminCreateInvitation(data);
-            const url = `${window.location.origin}/i/${slug}`;
+            const url = `${window.location.origin}/toi/${slug}`;
             const qrUrl = await generateQRDataURL(url);
             setQrData({ slug, qrUrl });
             setShowForm(false);
@@ -268,8 +268,8 @@ function InvitationsTab() {
                     <p className="text-green-800 font-semibold mb-1">Шақыру сәтті жасалды! 🎉</p>
                     <p className="text-green-700 text-sm mb-4">
                         Сілтеме:{' '}
-                        <a href={`/i/${qrData.slug}`} target="_blank" className="underline font-mono">
-                            /i/{qrData.slug}
+                        <a href={`/toi/${qrData.slug}`} target="_blank" className="underline font-mono">
+                            /toi/{qrData.slug}
                         </a>
                     </p>
                     <img src={qrData.qrUrl} alt="QR код" className="mx-auto w-40 h-40 rounded-xl border border-green-200" />
@@ -384,9 +384,9 @@ function InvitationsTab() {
                                     </td>
                                     <td className="px-4 py-3"><StatusBadge status={inv.status} /></td>
                                     <td className="px-4 py-3">
-                                        <a href={`/i/${inv.short_slug}`} target="_blank"
+                                        <a href={`/toi/${inv.short_slug}`} target="_blank"
                                             className="text-accent-600 hover:underline font-mono text-xs">
-                                            /i/{inv.short_slug}
+                                            /toi/{inv.short_slug}
                                         </a>
                                     </td>
                                 </tr>

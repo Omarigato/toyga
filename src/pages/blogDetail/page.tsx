@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import Navbar from '@/components/feature/Navbar';
 import Footer from '@/components/feature/Footer';
-import { blogArticles } from '@/mocks/homeData';
+import { blogArticles } from '@/core/constants/blogData';
 export default function BlogDetail() {
     const { slug } = useParams<{ slug: string }>();
     const article = blogArticles.find((a) => a.slug === slug);

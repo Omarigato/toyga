@@ -11,25 +11,63 @@ export class EventService {
   async getEventBySlug(slug: string): Promise<DbEvent> {
     const event = await this.eventRepo.findBySlug(slug);
     if (!event) {
-      throw new NotFoundError('Invitation', slug);
+      throw new NotFoundError('Event', slug);
+    }
+    return event;
+  }
+
+  async getEventById(id: number): Promise<DbEvent> {
+    const event = await this.eventRepo.findById(id);
+    if (!event) {
+      throw new NotFoundError('Event');
     }
     return event;
   }
 
   async createEvent(data: {
     userId: number;
-    templateId?: number;
+    templateId?: number | null;
+    title: string;
     slug: string;
-    ownerName: string;
-    ownerPhone?: string;
     type: string;
+    descriptionHtml?: string | null;
     eventDate: string;
-    audioUrl?: string;
-    location?: string;
-    lat?: number;
-    lng?: number;
-    customData?: any;
-  }) {
+    program?: any[];
+    hashtag?: string | null;
+    audioUrl?: string | null;
+    videoUrl?: string | null;
+    linkMode?: string;
+    address?: {
+      address_text: string;
+      place_name?: string | null;
+      lat?: number | null;
+      lng?: number | null;
+      map_link?: string | null;
+    } | null;
+  }): Promise<DbEvent> {
     return this.eventRepo.create(data);
+  }
+
+  async updateEvent(id: number, data: {
+    templateId?: number | null;
+    title?: string;
+    type?: string;
+    descriptionHtml?: string | null;
+    eventDate?: string;
+    program?: any[];
+    hashtag?: string | null;
+    audioUrl?: string | null;
+    videoUrl?: string | null;
+    linkMode?: string;
+    status?: string;
+    address?: {
+      address_text: string;
+      place_name?: string | null;
+      lat?: number | null;
+      lng?: number | null;
+      map_link?: string | null;
+    } | null;
+  }): Promise<DbEvent> {
+    return this.eventRepo.update(id, data);
   }
 }

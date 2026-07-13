@@ -4,8 +4,40 @@ import { NotFoundError, ForbiddenError } from '../_core/errors';
 
 export default withHandler(
   async (req, res: VercelResponse) => {
-    const userId = req.ctx.userId || req.ctx.adminId;
+    if (req.ctx.role === 'admin') {
+      const adminId = req.ctx.adminId;
+      if (!adminId) {
+        res.status(200).json({ success: true, user: null });
+        return;
+      }
 
+      const { rows } = await query<{
+        id: string;
+        email: string;
+      }>(
+        'SELECT id, email FROM admins WHERE id = $1 LIMIT 1',
+        [adminId]
+      );
+
+      const admin = rows[0];
+      if (!admin) {
+        res.setHeader('Set-Cookie', clearTokenCookie());
+        throw new NotFoundError('Admin');
+      }
+
+      res.status(200).json({
+        success: true,
+        user: {
+          id: admin.id,
+          name: 'Admin',
+          email: admin.email,
+          role: 'admin',
+        },
+      });
+      return;
+    }
+
+    const userId = req.ctx.userId;
     if (!userId) {
       res.status(200).json({ success: true, user: null });
       return;
@@ -42,7 +74,7 @@ export default withHandler(
         email: user.email,
         phone: user.phone,
         avatar_url: user.avatar_url,
-        role: req.ctx.role,
+        role: 'user',
       },
     });
   },

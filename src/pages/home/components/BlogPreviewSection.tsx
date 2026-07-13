@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { blogArticles } from '@/mocks/homeData';
+import { blogArticles } from '@/core/constants/blogData';
 export default function BlogPreviewSection() {
     return (
         <section className="w-full bg-background-100 py-12 md:py-16 lg:py-20">
