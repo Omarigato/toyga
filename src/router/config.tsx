@@ -13,6 +13,7 @@ const UserAuthPage = lazy(() => import("../pages/auth/UserAuthPage"));
 const AppTemplates = lazy(() => import("../pages/app/templates"));
 const AdminLoginPage = lazy(() => import("../pages/admin/LoginPage"));
 const AdminDashboardPage = lazy(() => import("../pages/admin/DashboardPage"));
+const SwaggerPage = lazy(() => import("../pages/swagger/page"));
 
 const routes: RouteObject[] = [
     { path: "/", element: <Home /> },
@@ -27,6 +28,7 @@ const routes: RouteObject[] = [
     { path: "/app/templates", element: <AppTemplates /> },
     { path: "/admin/login", element: <AdminLoginPage /> },
     { path: "/admin", element: <AdminDashboardPage /> },
+    { path: "/swagger", element: <SwaggerPage /> },
     { path: "*", element: <NotFound /> },
 ];
 
