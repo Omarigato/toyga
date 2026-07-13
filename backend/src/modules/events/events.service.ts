@@ -31,7 +31,7 @@ export class EventsService {
     templateId: string;
     title: string;
     eventType: string;
-    eventDate: Date;
+    eventDate: Date | string;
     location?: string;
     description?: string;
   }) {
@@ -44,7 +44,8 @@ export class EventsService {
       attempts++;
     }
 
-    const event = await this.eventsRepo.create({ ...data, slug });
+    const eventDate = typeof data.eventDate === 'string' ? new Date(data.eventDate) : data.eventDate;
+    const event = await this.eventsRepo.create({ ...data, eventDate, slug });
 
     await this.audit.log({
       userId: data.userId,

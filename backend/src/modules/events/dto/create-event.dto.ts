@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateEventDto {
@@ -17,8 +17,8 @@ export class CreateEventDto {
   eventType: string;
 
   @ApiProperty({ example: '2026-08-15T16:00:00+06:00' })
-  @IsDateString()
-  eventDate: Date;
+  @IsString()
+  eventDate: string;
 
   @ApiPropertyOptional({ example: 'Restaurant Bishkek, 15 Sayakbayev St' })
   @IsOptional()

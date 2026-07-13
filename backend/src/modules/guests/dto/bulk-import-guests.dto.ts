@@ -1,4 +1,4 @@
-import { IsArray, IsString, ValidateNested, MinLength, MaxLength } from 'class-validator';
+import { IsArray, IsString, ValidateNested, MinLength, MaxLength, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -10,14 +10,17 @@ class GuestImportItem {
   name: string;
 
   @ApiProperty({ example: '+77001234567' })
+  @IsOptional()
   @IsString()
   phone?: string;
 
   @ApiProperty({ example: 'aigerim@example.com' })
+  @IsOptional()
   @IsString()
   email?: string;
 
   @ApiProperty({ example: 'Dear Aigerim!' })
+  @IsOptional()
   @IsString()
   customMessage?: string;
 }
