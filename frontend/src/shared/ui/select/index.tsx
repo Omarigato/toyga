@@ -1,10 +1,7 @@
-"use client";
-
 import * as React from "react";
 import { cn } from "../../lib/utils";
-import { ChevronDown } from "lucide-react";
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   options: Array<{ value: string; label: string }>;
@@ -12,17 +9,23 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, placeholder, ...props }, ref) => (
-    <div className="w-full">
-      {label && <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-stone-300">{label}</label>}
-      <div className="relative">
+  ({ className, label, error, options, placeholder, id, ...props }, ref) => {
+    const selectId = id || label?.toLowerCase().replace(/\s+/g, "-");
+    return (
+      <div className="w-full">
+        {label && (
+          <label htmlFor={selectId} className="mb-1.5 block font-eyebrow text-[var(--text-eyebrow-size)] tracking-[0.08em] uppercase text-[var(--color-steppe)]">
+            {label}
+          </label>
+        )}
         <select
-          ref={ref}
+          id={selectId}
           className={cn(
-            "flex h-11 w-full appearance-none rounded-xl border border-stone-200 bg-white px-4 py-2 pr-10 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 dark:border-stone-800 dark:bg-stone-950 dark:text-stone-100",
-            error && "border-red-500",
+            "flex h-10 w-full appearance-none rounded-xl border border-[var(--color-steppe-40)] bg-[var(--color-parchment)] px-3 py-2 text-sm transition-all focus:border-[var(--color-gold)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:shadow-[var(--shadow-gold-glow)] disabled:cursor-not-allowed disabled:opacity-40",
+            error && "border-[var(--color-wine)] focus:border-[var(--color-wine)] focus:ring-[var(--color-wine)]",
             className
           )}
+          ref={ref}
           {...props}
         >
           {placeholder && <option value="">{placeholder}</option>}
@@ -30,11 +33,10 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+        {error && <p className="mt-1.5 text-xs text-[var(--color-wine)]">{error}</p>}
       </div>
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
-    </div>
-  )
+    );
+  }
 );
 Select.displayName = "Select";
 

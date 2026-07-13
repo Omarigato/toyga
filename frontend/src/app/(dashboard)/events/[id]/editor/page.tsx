@@ -9,6 +9,7 @@ import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Input } from "@/shared/ui/input";
 import { Modal } from "@/shared/ui/modal";
+import { SealSvg } from "@/shared/ui/seal-svg";
 import { generateId } from "@/shared/lib/utils";
 import type { CanvasBlock, BlockType } from "@/shared/types";
 import { APP_CONFIG } from "@/shared/config";
@@ -50,14 +51,14 @@ export default function EditorPage() {
     setSaving(true);
     try {
       await autosave.mutateAsync({ eventId, data: { canvasJson: { width: APP_CONFIG.editor.canvasWidth, height: APP_CONFIG.editor.canvasHeight, background: bg, blocks } } });
-      toast("success", t("editor.save"));
-    } catch { toast("error", t("common.error")); }
+      toast(t("editor.save") || "Сохранено", "success");
+    } catch { toast(t("common.error") || "Ошибка", "error"); }
     finally { setSaving(false); }
   }
 
   async function publishEvent() {
-    try { await publish.mutateAsync(eventId); toast("success", t("editor.publish")); }
-    catch { toast("error", t("common.error")); }
+    try { await publish.mutateAsync(eventId); toast(t("editor.publish") || "Опубликовано", "success"); }
+    catch { toast(t("common.error") || "Ошибка", "error"); }
   }
 
   function addBlock(type: BlockType) {
@@ -95,26 +96,26 @@ export default function EditorPage() {
     { type: "schedule", icon: List, label: t("editor.schedule") },
   ];
 
-  if (isLoading) return <div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" /></div>;
+  if (isLoading) return <div className="flex items-center justify-center py-20"><SealSvg size={48} className="text-[var(--color-gold)] animate-spin" /></div>;
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
       {/* Toolbar */}
-      <div className="flex items-center gap-2 border-b border-stone-200 bg-white px-4 py-2 dark:border-stone-800 dark:bg-stone-950">
+      <div className="flex items-center gap-2 border-b border-[var(--color-gold-12)] bg-[var(--color-parchment)] px-4 py-2">
         <Button variant="ghost" size="sm" onClick={() => router.back()}><ArrowLeft className="mr-1 h-4 w-4" /> {t("editor.back")}</Button>
         <div className="flex-1" />
-        <Badge variant={event?.status === "published" ? "success" : "secondary"}>{event?.status === "published" ? t("editor.published") : t("editor.draft")}</Badge>
+        <Badge variant={event?.status === "published" ? "published" : "draft"}>{event?.status === "published" ? t("editor.published") : t("editor.draft")}</Badge>
         <Button variant="outline" size="sm" onClick={() => setPreview(true)}><Eye className="mr-1 h-4 w-4" /> {t("editor.preview")}</Button>
         <Button size="sm" onClick={save} isLoading={saving}><Save className="mr-1 h-4 w-4" /> {t("editor.save")}</Button>
-        <Button size="sm" onClick={publishEvent} className="bg-emerald-600 hover:bg-emerald-500"><Send className="mr-1 h-4 w-4" /> {t("editor.publish")}</Button>
+        <Button size="sm" onClick={publishEvent}><Send className="mr-1 h-4 w-4" /> {t("editor.publish")}</Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Tools */}
-        <div className="w-16 border-r border-stone-200 bg-stone-50 p-2 dark:border-stone-800 dark:bg-stone-900">
+        <div className="w-16 border-r border-[var(--color-gold-12)] bg-[var(--color-steppe-15)] p-2">
           <div className="space-y-1">
             {tools.map((tool) => (
-              <button key={tool.type} onClick={() => addBlock(tool.type)} className="flex h-10 w-10 items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-200 dark:text-stone-400 dark:hover:bg-stone-800" title={tool.label}>
+              <button key={tool.type} onClick={() => addBlock(tool.type)} className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-steppe)] transition-colors hover:bg-[var(--color-gold-8)] hover:text-[var(--color-gold)]" title={tool.label}>
                 <tool.icon className="h-5 w-5" />
               </button>
             ))}
@@ -122,12 +123,12 @@ export default function EditorPage() {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 overflow-auto bg-stone-100 p-8 dark:bg-stone-900">
+        <div className="flex-1 overflow-auto bg-[var(--color-steppe-15)] p-8">
           <div className="mx-auto" style={{ maxWidth: 400 }}>
             <div className="relative mx-auto overflow-hidden rounded-2xl shadow-2xl" style={{ width: "100%", aspectRatio: "9/16", background: bg, maxHeight: "calc(100vh - 10rem)" }}>
               {blocks.filter((b) => b.visible).map((block) => (
                 <div key={block.id}
-                  className={`absolute cursor-move border-2 transition-all ${selected === block.id ? "border-amber-500 shadow-lg shadow-amber-500/20" : "border-transparent hover:border-amber-300"}`}
+                  className={`absolute cursor-move border-2 transition-all ${selected === block.id ? "border-[var(--color-gold)] shadow-lg shadow-[rgba(184,144,46,0.2)]" : "border-transparent hover:border-[var(--color-gold-40)]"}`}
                   style={{ left: `${(block.x / APP_CONFIG.editor.canvasWidth) * 100}%`, top: `${(block.y / APP_CONFIG.editor.canvasHeight) * 100}%`, width: `${(block.width / APP_CONFIG.editor.canvasWidth) * 100}%`, height: `${(block.height / APP_CONFIG.editor.canvasHeight) * 100}%`, opacity: block.opacity, transform: `rotate(${block.rotation}deg)` }}
                   onClick={() => setSelected(block.id)}
                   onKeyDown={(e) => {
@@ -141,11 +142,11 @@ export default function EditorPage() {
                   tabIndex={0}
                 >
                   {block.type === "text" && <div className="flex h-full w-full items-center justify-center p-2 text-center" style={{ fontSize: block.style?.fontSize || 24, color: block.style?.color || "#333", fontFamily: block.style?.fontFamily || "sans-serif", textAlign: block.style?.textAlign as any }}>{block.content}</div>}
-                  {block.type === "image" && block.src ? <img src={block.src} alt="" className="h-full w-full object-cover" /> : block.type === "image" ? <div className="flex h-full w-full items-center justify-center bg-stone-100 dark:bg-stone-800"><Image className="h-8 w-8 text-stone-300" /></div> : null}
-                  {block.type === "qr" && <div className="flex h-full w-full items-center justify-center bg-white"><QrCode className="h-12 w-12 text-stone-400" /></div>}
-                  {block.type === "countdown" && <div className="flex h-full w-full items-center justify-center bg-amber-50 dark:bg-amber-950/30"><div className="text-center"><Clock className="mx-auto h-6 w-6 text-amber-500" /><p className="mt-1 text-sm font-bold text-amber-700 dark:text-amber-400">00:00:00:00</p></div></div>}
-                  {block.type === "map" && <div className="flex h-full w-full items-center justify-center bg-blue-50 dark:bg-blue-950/30"><Map className="h-8 w-8 text-blue-400" /></div>}
-                  {block.type === "schedule" && <div className="flex h-full w-full items-center justify-center bg-stone-50 dark:bg-stone-800"><List className="h-8 w-8 text-stone-400" /></div>}
+                  {block.type === "image" && block.src ? <img src={block.src} alt="" className="h-full w-full object-cover" /> : block.type === "image" ? <div className="flex h-full w-full items-center justify-center bg-[var(--color-steppe-15)]"><Image className="h-8 w-8 text-[var(--color-steppe)]" /></div> : null}
+                  {block.type === "qr" && <div className="flex h-full w-full items-center justify-center bg-[var(--color-parchment)]"><QrCode className="h-12 w-12 text-[var(--color-steppe)]" /></div>}
+                  {block.type === "countdown" && <div className="flex h-full w-full items-center justify-center bg-[var(--color-gold-8)]"><div className="text-center"><Clock className="mx-auto h-6 w-6 text-[var(--color-gold)]" /><p className="mt-1 font-mono text-sm font-bold text-[var(--color-gold)]">00:00:00:00</p></div></div>}
+                  {block.type === "map" && <div className="flex h-full w-full items-center justify-center bg-[var(--color-gold-8)]"><Map className="h-8 w-8 text-[var(--color-tengri)]" /></div>}
+                  {block.type === "schedule" && <div className="flex h-full w-full items-center justify-center bg-[var(--color-steppe-15)]"><List className="h-8 w-8 text-[var(--color-steppe)]" /></div>}
                 </div>
               ))}
             </div>
@@ -153,19 +154,19 @@ export default function EditorPage() {
         </div>
 
         {/* Properties */}
-        <div className="w-72 overflow-y-auto border-l border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-950">
-          <h3 className="mb-4 text-sm font-semibold text-stone-500">{t("editor.properties")}</h3>
+        <div className="w-72 overflow-y-auto border-l border-[var(--color-gold-12)] bg-[var(--color-parchment)] p-4">
+          <h3 className="mb-4 font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-steppe)]">{t("editor.properties")}</h3>
           {sel ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Badge>{sel.type}</Badge>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => deleteBlock(sel.id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-[var(--color-wine)]" onClick={() => deleteBlock(sel.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
               {sel.type === "text" && (
                 <>
-                  <div><label className="mb-1 block text-xs font-medium">{t("editor.content")}</label><textarea value={sel.content || ""} onChange={(e) => updateBlock(sel.id, { content: e.target.value })} className="w-full rounded-lg border border-stone-200 p-2 text-sm dark:border-stone-800 dark:bg-stone-900" rows={3} /></div>
+                  <div><label className="mb-1 block font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-steppe)]">{t("editor.content")}</label><textarea value={sel.content || ""} onChange={(e) => updateBlock(sel.id, { content: e.target.value })} className="w-full rounded-xl border border-[var(--color-steppe-40)] bg-[var(--color-parchment)] p-2 text-sm focus:border-[var(--color-gold)] focus:outline-none" rows={3} /></div>
                   <Input label={t("editor.fontSize")} type="number" value={sel.style?.fontSize || 24} onChange={(e) => updateBlock(sel.id, { style: { ...sel.style, fontSize: Number(e.target.value) } })} />
-                  <div><label className="mb-1 block text-xs font-medium">{t("editor.color")}</label><input type="color" value={sel.style?.color || "#333333"} onChange={(e) => updateBlock(sel.id, { style: { ...sel.style, color: e.target.value } })} className="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-800" /></div>
+                  <div><label className="mb-1 block font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-steppe)]">{t("editor.color")}</label><input type="color" value={sel.style?.color || "#333333"} onChange={(e) => updateBlock(sel.id, { style: { ...sel.style, color: e.target.value } })} className="h-10 w-full rounded-xl border border-[var(--color-steppe-40)]" /></div>
                 </>
               )}
               {sel.type === "image" && <Input label={t("editor.url")} value={sel.src || ""} onChange={(e) => updateBlock(sel.id, { src: e.target.value })} placeholder="https://..." />}
@@ -176,12 +177,12 @@ export default function EditorPage() {
                 <Input label={t("editor.height")} type="number" value={sel.height} onChange={(e) => updateBlock(sel.id, { height: Number(e.target.value) })} />
               </div>
               <Input label="Rotation" type="number" value={sel.rotation} onChange={(e) => updateBlock(sel.id, { rotation: Number(e.target.value) })} />
-              <div><label className="mb-1 block text-xs font-medium">Opacity</label><input type="range" min="0" max="1" step="0.1" value={sel.opacity} onChange={(e) => updateBlock(sel.id, { opacity: Number(e.target.value) })} className="w-full" /></div>
+              <div><label className="mb-1 block font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-steppe)]">Opacity</label><input type="range" min="0" max="1" step="0.1" value={sel.opacity} onChange={(e) => updateBlock(sel.id, { opacity: Number(e.target.value) })} className="w-full accent-[var(--color-gold)]" /></div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div><label className="mb-1 block text-xs font-medium">{t("editor.background")}</label><input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-800" /></div>
-              <p className="text-xs text-stone-400">{t("editor.selectBlock")}</p>
+              <div><label className="mb-1 block font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-steppe)]">{t("editor.background")}</label><input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-10 w-full rounded-xl border border-[var(--color-steppe-40)]" /></div>
+              <p className="text-xs text-[var(--color-steppe)]">{t("editor.selectBlock")}</p>
             </div>
           )}
         </div>

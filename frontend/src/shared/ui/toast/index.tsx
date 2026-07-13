@@ -2,27 +2,45 @@
 
 import * as React from "react";
 import { cn } from "../../lib/utils";
+import { CheckCircle, XCircle, Info, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, CheckCircle2, AlertCircle, Info } from "lucide-react";
+
+type ToastType = "success" | "error" | "info";
 
 interface Toast {
   id: string;
-  type: "success" | "error" | "info";
   message: string;
+  type: ToastType;
 }
 
-interface ToastContextValue {
-  toast: (type: Toast["type"], message: string) => void;
+interface ToastContextType {
+  toast: (message: string, type?: ToastType) => void;
 }
 
-const ToastContext = React.createContext<ToastContextValue | null>(null);
+const ToastContext = React.createContext<ToastContextType>({ toast: () => {} });
+
+export function useToast() {
+  return React.useContext(ToastContext);
+}
+
+const accentMap: Record<ToastType, string> = {
+  success: "border-l-[var(--color-gold)]",
+  error: "border-l-[var(--color-wine)]",
+  info: "border-l-[var(--color-tengri)]",
+};
+
+const iconMap: Record<ToastType, React.ReactNode> = {
+  success: <CheckCircle className="h-4 w-4 text-[var(--color-gold)]" />,
+  error: <XCircle className="h-4 w-4 text-[var(--color-wine)]" />,
+  info: <Info className="h-4 w-4 text-[var(--color-tengri)]" />,
+};
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<Toast[]>([]);
 
-  const toast = React.useCallback((type: Toast["type"], message: string) => {
-    const id = Math.random().toString(36).slice(2);
-    setToasts((prev) => [...prev, { id, type, message }]);
+  const toast = React.useCallback((message: string, type: ToastType = "success") => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
   }, []);
 
@@ -34,30 +52,23 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           {toasts.map((t) => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
               className={cn(
-                "flex items-center gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-sm",
-                t.type === "success" && "border-emerald-200 bg-emerald-50 text-emerald-800",
-                t.type === "error" && "border-red-200 bg-red-50 text-red-800",
-                t.type === "info" && "border-blue-200 bg-blue-50 text-blue-800"
+                "flex items-center gap-3 rounded-xl border-l-[3px] bg-[var(--color-ink)] px-4 py-3 text-sm text-[var(--color-parchment)] shadow-lg",
+                accentMap[t.type]
               )}
             >
-              {t.type === "success" && <CheckCircle2 className="h-5 w-5" />}
-              {t.type === "error" && <AlertCircle className="h-5 w-5" />}
-              {t.type === "info" && <Info className="h-5 w-5" />}
-              <span className="text-sm font-medium">{t.message}</span>
+              {iconMap[t.type]}
+              <span className="flex-1">{t.message}</span>
+              <button onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))} className="text-[var(--color-steppe)] hover:text-[var(--color-parchment)]">
+                <X className="h-3.5 w-3.5" />
+              </button>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  const ctx = React.useContext(ToastContext);
-  if (!ctx) throw new Error("useToast must be used within ToastProvider");
-  return ctx;
 }

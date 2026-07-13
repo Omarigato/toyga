@@ -1,43 +1,177 @@
 @import "tailwindcss";
 
-* { border-color: theme(--color-stone-200); }
-.dark * { border-color: theme(--color-stone-800); }
+/* ── Toyga.kz Brand Design Tokens v2 ────────────────────────── */
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+:root {
+  /* Core palette */
+  --color-ink: #15110D;
+  --color-parchment: #F4ECD8;
+  --color-gold: #B8902E;
+  --color-gold-hover: #A17E28;
+  --color-wine: #5C1A24;
+  --color-wine-hover: #4A1520;
+  --color-steppe: #9C9280;
+  --color-tengri: #26424A;
+
+  /* Derived */
+  --color-gold-light: #E8C978;
+  --color-ink-92: rgba(21, 17, 13, 0.92);
+  --color-parchment-95: rgba(244, 236, 216, 0.95);
+  --color-gold-8: rgba(184, 144, 46, 0.08);
+  --color-gold-12: rgba(184, 144, 46, 0.12);
+  --color-gold-18: rgba(184, 144, 46, 0.18);
+  --color-gold-20: rgba(184, 144, 46, 0.20);
+  --color-gold-40: rgba(184, 144, 46, 0.40);
+  --color-wine-10: rgba(92, 26, 36, 0.10);
+  --color-steppe-15: rgba(156, 146, 128, 0.15);
+  --color-steppe-25: rgba(156, 146, 128, 0.25);
+  --color-steppe-40: rgba(156, 146, 128, 0.40);
+  --color-parchment-4: rgba(244, 236, 216, 0.04);
+  --color-parchment-6: rgba(244, 236, 216, 0.06);
+  --color-ink-55: rgba(21, 17, 13, 0.55);
+  --color-ink-72: rgba(21, 17, 13, 0.72);
+
+  /* Typography scale */
+  --text-display-xl: 3.25rem;
+  --text-display-lg: 2.25rem;
+  --text-display-md: 1.5rem;
+  --text-body-lg: 1.125rem;
+  --text-body-md: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-eyebrow-size: 0.75rem;
+
+  /* Shadows */
+  --shadow-seal: 0 8px 30px -8px rgba(21, 17, 13, 0.45);
+  --shadow-seal-gold: inset 0 1px 0 rgba(184, 144, 46, 0.25);
+  --shadow-gold-glow: 0 0 0 3px rgba(184, 144, 46, 0.15);
 }
 
-html { scroll-behavior: smooth; }
+/* ── Base ────────────────────────────────────────────────────── */
+
+* {
+  border-color: var(--color-steppe-40);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  font-family: "Golos Text", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Fonts ───────────────────────────────────────────────────── */
+
+.font-display { font-family: "Yeseva One", "Golos Text", serif; }
+.font-body { font-family: "Golos Text", system-ui, sans-serif; }
+.font-mono { font-family: "PT Mono", "Courier New", monospace; }
+.font-eyebrow { font-family: "Forum", "Golos Text", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
-.dark ::-webkit-scrollbar-thumb { background: #44403c; }
+::-webkit-scrollbar-thumb { background: var(--color-steppe); border-radius: 3px; }
 
-::selection { background: #fde68a; color: #1c1917; }
+::selection { background: var(--color-gold); color: var(--color-ink); }
+
+/* ── Brand utilities ─────────────────────────────────────────── */
+
+.glass {
+  background: var(--color-ink-55);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-gold-18);
+}
+
+.glass-light {
+  background: var(--color-parchment-95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-gold-12);
+}
 
 .gradient-text {
-  background: linear-gradient(135deg, #f59e0b, #b45309);
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
+/* Seal card variants */
+.card-paper {
+  background: var(--color-parchment);
+  border-radius: 1.25rem;
+  border: 1px solid var(--color-gold-12);
+  box-shadow: var(--shadow-seal);
 }
-.dark .glass {
-  background: rgba(12, 10, 9, 0.8);
+
+.card-seal {
+  background: var(--color-parchment-4);
+  border-radius: 1.25rem;
+  border: 1px solid var(--color-gold-20);
+  box-shadow: var(--shadow-seal-gold);
 }
+
+/* Scroll reveal animation */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Section divider */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  opacity: 0.4;
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes sealStroke {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--color-steppe-15) 25%, var(--color-steppe-25) 50%, var(--color-steppe-15) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
