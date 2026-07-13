@@ -1,0 +1,281 @@
+// TOYGA.KZ V2 — Prisma Schema (read-only, mirrors database/schema.sql)
+// DO NOT run prisma migrate — schema is managed via raw SQL files.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @db.VarChar(255)
+  email         String?   @unique @db.VarChar(255)
+  phone         String?   @unique @db.VarChar(20)
+  passwordHash  String?   @map("password_hash") @db.VarChar(255)
+  googleId      String?   @map("google_id") @db.VarChar(255)
+  avatarUrl     String?   @map("avatar_url") @db.Text
+  role          String    @default("user") @db.VarChar(20)
+  status        String    @default("active") @db.VarChar(20)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz()
+
+  authSessions  auth_sessions[]
+  events        events[]
+  media         media[]
+  auditLogs     audit_logs[]
+
+  @@map("users")
+}
+
+model auth_sessions {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  refreshTokenHash  String    @map("refresh_token_hash") @db.VarChar(255)
+  ipAddress         String?   @map("ip_address") @db.Inet
+  userAgent         String?   @map("user_agent") @db.Text
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz()
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt         DateTime? @map("deleted_at") @db.Timestamptz()
+
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
+}
+
+model otp_codes {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phone     String    @db.VarChar(20)
+  codeHash  String    @map("code_hash") @db.VarChar(255)
+  attempts  Int       @default(0)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz()
+  usedAt    DateTime? @map("used_at") @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz()
+
+  @@map("otp_codes")
+}
+
+model categories {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String    @db.VarChar(100)
+  slug        String    @unique @db.VarChar(100)
+  description String?   @db.Text
+  imageUrl    String?   @map("image_url") @db.Text
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+
+  templates templates[]
+
+  @@map("categories")
+}
+
+model templates {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId      String    @map("category_id") @db.Uuid
+  name            String    @db.VarChar(255)
+  slug            String    @unique @db.VarChar(255)
+  description     String?   @db.Text
+  previewUrl      String?   @map("preview_url") @db.Text
+  thumbnailUrl    String?   @map("thumbnail_url") @db.Text
+  canvasJson      Json      @default("{\"width\":1080,\"height\":1920,\"background\":\"#ffffff\",\"blocks\":[]}") @map("canvas_json")
+  animationConfig Json      @default("{\"timeline\":[],\"global\":{\"duration\":0,\"easing\":\"ease-in-out\"}}") @map("animation_config")
+  designTokens    Json      @default("{\"colors\":{},\"fonts\":{},\"spacing\":{}}") @map("design_tokens")
+  isPremium       Boolean   @default(false) @map("is_premium")
+  status          String    @default("draft") @db.VarChar(20)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz()
+
+  category     categories     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  assets       template_assets[]
+  events       events[]
+
+  @@map("templates")
+}
+
+model template_assets {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  templateId  String    @map("template_id") @db.Uuid
+  type        String    @db.VarChar(20)
+  url         String    @db.Text
+  name        String    @db.VarChar(255)
+  metadata    Json      @default("{}")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+
+  template templates @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@map("template_assets")
+}
+
+model events {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  templateId  String    @map("template_id") @db.Uuid
+  title       String    @db.VarChar(255)
+  slug        String    @unique @db.VarChar(255)
+  eventType   String    @map("event_type") @db.VarChar(50)
+  eventDate   DateTime  @map("event_date") @db.Timestamptz()
+  location    String?   @db.VarChar(500)
+  description String?   @db.Text
+  status      String    @default("draft") @db.VarChar(20)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+
+  user             users              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template         templates          @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  eventContents    event_contents[]
+  eventVersions    event_versions[]
+  guests           guests[]
+  invitationLinks  invitation_links[]
+  media            media[]
+  rsvp             rsvp[]
+  whatsappMessages whatsapp_messages[]
+
+  @@map("events")
+}
+
+model event_contents {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String    @map("event_id") @db.Uuid
+  canvasJson  Json      @default("{\"width\":1080,\"height\":1920,\"background\":\"#ffffff\",\"blocks\":[]}") @map("canvas_json")
+  contentJson Json      @default("{}") @map("content_json")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+
+  event events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("event_contents")
+}
+
+model event_versions {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  versionNumber  Int      @map("version_number")
+  snapshotJson   Json     @map("snapshot_json")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  event events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, versionNumber])
+  @@map("event_versions")
+}
+
+model media {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  eventId   String?   @map("event_id") @db.Uuid
+  type      String    @db.VarChar(20)
+  fileName  String    @map("file_name") @db.VarChar(255)
+  fileUrl   String    @map("file_url") @db.Text
+  mimeType  String    @map("mime_type") @db.VarChar(100)
+  size      BigInt    @db.BigInt
+  metadata  Json      @default("{}")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz()
+
+  user  users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event events? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@map("media")
+}
+
+model guests {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String    @map("event_id") @db.Uuid
+  name           String    @db.VarChar(255)
+  phone          String?   @db.VarChar(20)
+  email          String?   @db.VarChar(255)
+  personalSlug   String    @unique @map("personal_slug") @db.VarChar(255)
+  customMessage  String?   @map("custom_message") @db.Text
+  status         String    @default("pending") @db.VarChar(20)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz()
+
+  event           events            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  invitationLinks invitation_links[]
+  rsvp            rsvp[]
+  whatsappMessages whatsapp_messages[]
+
+  @@map("guests")
+}
+
+model invitation_links {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId    String    @map("event_id") @db.Uuid
+  guestId    String?   @map("guest_id") @db.Uuid
+  slug       String    @unique @db.VarChar(255)
+  isPersonal Boolean   @default(false) @map("is_personal")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz()
+
+  event events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  guest guests? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@map("invitation_links")
+}
+
+model rsvp {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
+  guestId   String   @map("guest_id") @db.Uuid
+  answer    String   @db.VarChar(20)
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+
+  event events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  guest guests @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, guestId])
+  @@map("rsvp")
+}
+
+model whatsapp_messages {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId      String    @map("event_id") @db.Uuid
+  guestId      String?   @map("guest_id") @db.Uuid
+  phone        String    @db.VarChar(20)
+  message      String    @db.Text
+  scheduledAt  DateTime? @map("scheduled_at") @db.Timestamptz()
+  sentAt       DateTime? @map("sent_at") @db.Timestamptz()
+  status       String    @default("pending") @db.VarChar(20)
+  attempts     Int       @default(0)
+  errorMessage String?   @map("error_message") @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+
+  event events  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  guest guests? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@map("whatsapp_messages")
+}
+
+model audit_logs {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   String   @map("entity_id") @db.Uuid
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user users? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
