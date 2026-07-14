@@ -35,6 +35,7 @@ vite.config.ts.timestamp-*
 
 # Gemini Agent IDE cache
 .gemini
+*.next
 
 # Google Cloud Service Account
 toyga-kz-*.json
