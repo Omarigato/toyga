@@ -13,13 +13,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="mb-1.5 block font-eyebrow text-[var(--text-eyebrow-size)] tracking-[0.08em] uppercase text-[var(--color-steppe)]">
+          <label htmlFor={inputId} className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-stone-500">
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-steppe)]">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
               {icon}
             </div>
           )}
@@ -27,16 +27,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             id={inputId}
             className={cn(
-              "flex h-10 w-full rounded-xl border border-[var(--color-steppe-40)] bg-[var(--color-parchment)] px-3 py-2 text-sm transition-all placeholder:text-[var(--color-steppe)] focus:border-[var(--color-gold)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-0 focus:shadow-[var(--shadow-gold-glow)] disabled:cursor-not-allowed disabled:opacity-40",
+              "flex h-10 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm transition-all placeholder:text-stone-400 focus:border-[var(--color-gold)] focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)]/20 disabled:cursor-not-allowed disabled:opacity-40",
               icon && "pl-10",
-              error && "border-[var(--color-wine)] focus:border-[var(--color-wine)] focus:ring-[var(--color-wine)]",
+              error && "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20",
               className
             )}
             ref={ref}
             {...props}
           />
         </div>
-        {error && <p className="mt-1.5 text-xs text-[var(--color-wine)]">{error}</p>}
+        {error && <p className="mt-1.5 text-xs text-[var(--color-error)]">{error}</p>}
       </div>
     );
   }

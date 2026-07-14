@@ -42,23 +42,26 @@ export function Modal({ open, onClose, children, title, size = "md" }: ModalProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-[var(--color-ink-72)] backdrop-blur-[6px]"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
+            initial={{ opacity: 0, scale: 0.97, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             className={cn(
-              "relative w-full rounded-2xl border border-[var(--color-gold-12)] bg-[var(--color-parchment)] p-6 shadow-[var(--shadow-seal)]",
+              "relative w-full rounded-2xl border border-stone-100 bg-white p-6 shadow-xl",
               sizeClasses[size]
             )}
           >
             {title && (
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{title}</h2>
-                <button onClick={onClose} className="rounded-lg p-1 text-[var(--color-steppe)] hover:bg-[var(--color-steppe-15)] hover:text-[var(--color-ink)]">
+                <h2 className="font-display text-lg font-semibold text-stone-900">{title}</h2>
+                <button
+                  onClick={onClose}
+                  className="rounded-xl p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-colors"
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>

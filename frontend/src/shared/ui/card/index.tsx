@@ -2,17 +2,17 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "paper" | "seal";
+  variant?: "default" | "elevated";
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "paper", ...props }, ref) => (
+  ({ className, variant = "default", ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        variant === "paper"
-          ? "rounded-2xl border border-[var(--color-gold-12)] bg-[var(--color-parchment)] shadow-[var(--shadow-seal)] transition-shadow hover:shadow-lg"
-          : "rounded-2xl border border-[var(--color-gold-20)] bg-[var(--color-parchment-4)] shadow-[var(--shadow-seal-gold)]",
+        variant === "elevated"
+          ? "rounded-2xl border border-stone-100 bg-white shadow-md"
+          : "rounded-2xl border border-stone-100 bg-white shadow-sm transition-shadow hover:shadow-md",
         className
       )}
       {...props}
@@ -30,14 +30,14 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("text-xl font-semibold leading-none tracking-tight", className)} {...props} />
+    <h3 ref={ref} className={cn("font-display text-xl font-semibold leading-none tracking-tight", className)} {...props} />
   )
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-[var(--color-steppe)]", className)} {...props} />
+    <p ref={ref} className={cn("text-sm text-stone-500", className)} {...props} />
   )
 );
 CardDescription.displayName = "CardDescription";

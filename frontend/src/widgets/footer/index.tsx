@@ -1,47 +1,45 @@
 import Link from "next/link";
-import { SealSvg } from "@/shared/ui/seal-svg";
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-[var(--color-gold-12)] bg-[var(--color-ink)]">
+    <footer className="border-t border-stone-100 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <SealSvg size={24} className="text-[var(--color-gold)]" />
-              <span className="font-body text-lg font-semibold text-[var(--color-parchment)]">Той<span className="text-[var(--color-gold)]">ға</span></span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-ink)]">
+                <span className="text-sm font-bold text-white">Т</span>
+              </div>
+              <span className="font-display text-lg font-semibold text-stone-900">Тойға</span>
             </Link>
-            <p className="mt-3 text-sm text-[var(--color-steppe)]">Цифровые приглашения для торжеств</p>
+            <p className="mt-3 text-sm text-stone-500">Цифровые приглашения для торжеств</p>
           </div>
           <div>
-            <h4 className="mb-3 font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-gold)]">Продукт</h4>
-            <ul className="space-y-2 text-sm text-[var(--color-steppe)]">
-              <li><Link href="/templates" className="hover:text-[var(--color-parchment)] transition-colors">Шаблоны</Link></li>
-              <li><Link href="/register" className="hover:text-[var(--color-parchment)] transition-colors">Начать</Link></li>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-stone-400">Категории</h4>
+            <ul className="space-y-2 text-sm text-stone-600">
+              <li><Link href="/wedding" className="hover:text-stone-900 transition-colors">Свадьба</Link></li>
+              <li><Link href="/qyz-uzaty" className="hover:text-stone-900 transition-colors">Қыз ұзату</Link></li>
+              <li><Link href="/sundet-toy" className="hover:text-stone-900 transition-colors">Сүндет той</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-gold)]">Поддержка</h4>
-            <ul className="space-y-2 text-sm text-[var(--color-steppe)]">
-              <li><Link href="#" className="hover:text-[var(--color-parchment)] transition-colors">FAQ</Link></li>
-              <li><Link href="#" className="hover:text-[var(--color-parchment)] transition-colors">Контакты</Link></li>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-stone-400">Продукт</h4>
+            <ul className="space-y-2 text-sm text-stone-600">
+              <li><Link href="/events" className="hover:text-stone-900 transition-colors">Мои мероприятия</Link></li>
+              <li><Link href="/templates" className="hover:text-stone-900 transition-colors">Шаблоны</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="mb-3 font-eyebrow text-xs tracking-[0.08em] uppercase text-[var(--color-gold)]">Правовая информация</h4>
-            <ul className="space-y-2 text-sm text-[var(--color-steppe)]">
-              <li><Link href="#" className="hover:text-[var(--color-parchment)] transition-colors">Конфиденциальность</Link></li>
-              <li><Link href="#" className="hover:text-[var(--color-parchment)] transition-colors">Условия</Link></li>
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-stone-400">Правовая информация</h4>
+            <ul className="space-y-2 text-sm text-stone-600">
+              <li><Link href="#" className="hover:text-stone-900 transition-colors">Конфиденциальность</Link></li>
+              <li><Link href="#" className="hover:text-stone-900 transition-colors">Условия</Link></li>
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-[var(--color-gold-12)] pt-6 text-center text-sm text-[var(--color-steppe)]">
-          © 2026 Тойға
+        <div className="mt-8 border-t border-stone-100 pt-6 text-center text-sm text-stone-400">
+          &copy; 2026 Тойға. Все права защищены.
         </div>
-      </div>
-      {/* Seal watermark */}
-      <div className="pointer-events-none absolute -bottom-10 -right-10 opacity-[0.06]">
-        <SealSvg size={200} className="text-[var(--color-gold)]" />
       </div>
     </footer>
   );

@@ -137,6 +137,15 @@ export function useBulkImportGuests() {
   });
 }
 
+export function useUpdateGuest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Guest> }) =>
+      api.put(`/guests/${id}`, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["guests"] }),
+  });
+}
+
 export function useDeleteGuest() {
   const qc = useQueryClient();
   return useMutation({
