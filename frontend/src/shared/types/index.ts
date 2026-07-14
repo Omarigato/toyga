@@ -67,6 +67,14 @@ export interface Template {
   designTokens: DesignTokens;
   isPremium: boolean;
   status: string;
+  // V3: Marketplace
+  originalTemplateId: string | null;
+  clonedBy: string | null;
+  source: "original" | "cloned" | "imported";
+  priceKzt: number;
+  downloadCount: number;
+  ratingAvg: number;
+  ratingCount: number;
   category: { id: string; name: string; slug: string };
   assets: TemplateAsset[];
   createdAt: string;
@@ -107,12 +115,36 @@ export interface Guest {
   personalSlug: string;
   customMessage: string | null;
   status: GuestStatus;
+  // V3: Telegram
+  telegramUsername: string | null;
+  // V3: Groups
+  groupKey: string | null;
+  groupRole: "primary" | "secondary";
+  partnerGuestId: string | null;
+  partnerGuest?: { id: string; name: string } | null;
+  // V3: Multi-channel send status
+  whatsappStatus: SendStatus;
+  whatsappSentAt: string | null;
+  whatsappError: string | null;
+  telegramStatus: SendStatus;
+  telegramSentAt: string | null;
+  telegramError: string | null;
+  emailStatus: SendStatus;
+  emailSentAt: string | null;
+  emailError: string | null;
+  // V3: RSVP
+  rsvpStatus: RsvpStatus;
+  rsvpComment: string | null;
+  rsvpAnsweredAt: string | null;
+  sortOrder: number;
   rsvp: Rsvp[];
   invitationLinks: InvitationLink[];
   createdAt: string;
 }
 
 export type GuestStatus = "pending" | "invited" | "viewed" | "confirmed" | "declined" | "maybe";
+export type SendStatus = "pending" | "sent" | "delivered" | "failed";
+export type RsvpStatus = "pending" | "confirmed" | "declined" | "maybe";
 
 export interface Rsvp {
   id: string;
@@ -206,3 +238,94 @@ export interface DesignTokens {
 
 // ─── Event Types ─────────────────────────────────────────────────────────
 export type EventType = "wedding" | "kyz-uzatu" | "sundet" | "birthday" | "anniversary" | "corporate" | "baby-shower" | "other";
+
+// ─── V3: Dictionary ─────────────────────────────────────────────────────
+export interface DictionaryEntry {
+  id: string;
+  category: string;
+  key: string;
+  value: Record<string, unknown>;
+  label: string | null;
+  labelRu: string | null;
+  labelEn: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+// ─── V3: App Settings ───────────────────────────────────────────────────
+export interface AppSetting {
+  id: string;
+  key: string;
+  value: unknown;
+  category: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── V3: Notification Templates ─────────────────────────────────────────
+export interface NotificationTemplate {
+  id: string;
+  name: string;
+  channel: NotificationChannel;
+  subject: string | null;
+  body: string;
+  htmlBody: string | null;
+  variables: string[];
+  isDefault: boolean;
+  isActive: boolean;
+  eventType: string | null;
+  createdAt: string;
+}
+
+// ─── V3: Notification Queue ─────────────────────────────────────────────
+export interface NotificationJob {
+  id: string;
+  eventId: string;
+  guestId: string | null;
+  channel: NotificationChannel;
+  recipient: string;
+  subject: string | null;
+  message: string;
+  htmlMessage: string | null;
+  mediaUrls: string[];
+  templateId: string | null;
+  templateVars: Record<string, string>;
+  status: NotificationStatus;
+  scheduledAt: string | null;
+  sentAt: string | null;
+  deliveredAt: string | null;
+  failedAt: string | null;
+  attempts: number;
+  maxAttempts: number;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
+export type NotificationChannel = "whatsapp" | "telegram" | "email";
+export type NotificationStatus = "pending" | "processing" | "sent" | "delivered" | "failed" | "cancelled";
+
+// ─── V3: Guest Group ────────────────────────────────────────────────────
+export interface GuestGroup {
+  key: string;
+  label: string;
+  primaryGuest: Guest;
+  members: Guest[];
+}
+
+// ─── V3: Send Status Summary ────────────────────────────────────────────
+export interface SendStatusSummary {
+  total: number;
+  whatsapp: { pending: number; sent: number; delivered: number; failed: number };
+  telegram: { pending: number; sent: number; delivered: number; failed: number };
+  email: { pending: number; sent: number; delivered: number; failed: number };
+  rsvp: { pending: number; confirmed: number; declined: number; maybe: number };
+}
+
+// ─── V3: Channels Status ────────────────────────────────────────────────
+export interface ChannelsStatus {
+  whatsapp: boolean;
+  telegram: boolean;
+  email: boolean;
+}

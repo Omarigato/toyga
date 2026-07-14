@@ -10,6 +10,8 @@ import { GuestsModule } from './modules/guests/guests.module';
 import { WhatsAppModule } from './modules/whatsapp/whatsapp.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
+import { DictionaryModule } from './modules/dictionary/dictionary.module';
+import { AppSettingsModule } from './modules/app-settings/app-settings.module';
 import { RequestIdMiddleware } from './core/middleware/request-id.middleware';
 import { LoggingMiddleware } from './core/middleware/logging.middleware';
 import { LanguageMiddleware } from './core/middleware/language.middleware';
@@ -28,6 +30,8 @@ import { SecurityMiddleware } from './core/middleware/security.middleware';
     WhatsAppModule,
     AdminModule,
     HealthModule,
+    DictionaryModule,
+    AppSettingsModule,
   ],
 })
 export class AppModule implements NestModule {

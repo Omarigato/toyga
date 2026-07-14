@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsObject, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsObject, IsNumber, MinLength, MaxLength, Matches, IsIn } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTemplateDto {
@@ -58,4 +58,21 @@ export class CreateTemplateDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  // V3: Marketplace fields
+  @ApiPropertyOptional({ enum: ['original', 'cloned', 'imported'], default: 'original', description: 'Template source' })
+  @IsOptional()
+  @IsString()
+  @IsIn(['original', 'cloned', 'imported'])
+  source?: string;
+
+  @ApiPropertyOptional({ description: 'Original template ID (for clones)', minimum: 0 })
+  @IsOptional()
+  @IsString()
+  originalTemplateId?: string;
+
+  @ApiPropertyOptional({ description: 'Price in KZT (0 = free)', minimum: 0 })
+  @IsOptional()
+  @IsNumber()
+  priceKzt?: number;
 }

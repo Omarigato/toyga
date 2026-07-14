@@ -37,6 +37,9 @@ export class TemplatesService {
     designTokens?: any;
     isPremium?: boolean;
     status?: string;
+    source?: string;
+    originalTemplateId?: string;
+    priceKzt?: number;
   }, userId?: string) {
     if (data.slug) {
       const existing = await this.templatesRepo.findBySlug(data.slug);
@@ -101,7 +104,42 @@ export class TemplatesService {
     return { success: true };
   }
 
-  // ─── Template Assets ─────────────────────────────────────────────────
+  // ─── V3: Template Cloning ──────────────────────────────────────────
+
+  async clone(templateId: string, userId: string) {
+    const template = await this.templatesRepo.findById(templateId);
+    if (!template) throw new NotFoundException('TEMPLATE_NOT_FOUND');
+
+    const cloned = await this.templatesRepo.clone(templateId, userId);
+    if (!cloned) throw new ConflictException('TEMPLATE_CLONE_FAILED');
+
+    await this.audit.log({
+      userId,
+      action: AuditAction.TEMPLATE_CLONE,
+      entityType: 'template',
+      entityId: cloned.id,
+      metadata: { originalId: templateId, originalName: template.name },
+    });
+
+    return cloned;
+  }
+
+  // ─── V3: Marketplace ───────────────────────────────────────────────
+
+  async findMarketplace(categorySlug?: string, source?: string) {
+    return this.templatesRepo.findMarketplace(categorySlug, source);
+  }
+
+  async incrementDownloadCount(id: string) {
+    return this.templatesRepo.incrementDownloadCount(id);
+  }
+
+  async updateRating(id: string, rating: number) {
+    return this.templatesRepo.updateRating(id, rating);
+  }
+
+  // ─── Template Assets ────────────────────────────────────────────────
+
   async addAsset(templateId: string, data: { type: string; url: string; name: string; metadata?: any }) {
     await this.findById(templateId);
     return this.templatesRepo.addAsset(templateId, data);

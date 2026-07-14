@@ -33,6 +33,12 @@ export enum TemplateStatus {
   ARCHIVED = 'archived',
 }
 
+export enum TemplateSource {
+  ORIGINAL = 'original',
+  CLONED = 'cloned',
+  IMPORTED = 'imported',
+}
+
 export enum MediaType {
   IMAGE = 'image',
   MUSIC = 'music',
@@ -48,10 +54,37 @@ export enum GuestStatus {
   MAYBE = 'maybe',
 }
 
+export enum GuestGroupRole {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+}
+
 export enum RsvpAnswer {
   YES = 'yes',
   NO = 'no',
   MAYBE = 'maybe',
+}
+
+export enum SendStatus {
+  PENDING = 'pending',
+  SENT = 'sent',
+  DELIVERED = 'delivered',
+  FAILED = 'failed',
+}
+
+export enum NotificationChannel {
+  WHATSAPP = 'whatsapp',
+  TELEGRAM = 'telegram',
+  EMAIL = 'email',
+}
+
+export enum NotificationStatus {
+  PENDING = 'pending',
+  PROCESSING = 'processing',
+  SENT = 'sent',
+  DELIVERED = 'delivered',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled',
 }
 
 export enum WhatsAppStatus {

@@ -1,6 +1,6 @@
-import { IsArray, IsString, ValidateNested, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsArray, IsString, ValidateNested, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class GuestImportItem {
   @ApiProperty({ example: 'Aigerim' })
@@ -18,6 +18,22 @@ class GuestImportItem {
   @IsOptional()
   @IsString()
   email?: string;
+
+  @ApiPropertyOptional({ example: '@aigerim' })
+  @IsOptional()
+  @IsString()
+  telegramUsername?: string;
+
+  @ApiPropertyOptional({ description: 'Group key for families/couples' })
+  @IsOptional()
+  @IsString()
+  groupKey?: string;
+
+  @ApiPropertyOptional({ enum: ['primary', 'secondary'], default: 'primary' })
+  @IsOptional()
+  @IsString()
+  @IsIn(['primary', 'secondary'])
+  groupRole?: string;
 
   @ApiProperty({ example: 'Dear Aigerim!' })
   @IsOptional()

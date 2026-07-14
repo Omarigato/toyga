@@ -32,6 +32,10 @@ export class GuestsService {
     phone?: string;
     email?: string;
     customMessage?: string;
+    telegramUsername?: string;
+    groupKey?: string;
+    groupRole?: string;
+    partnerGuestId?: string;
   }, userId?: string) {
     let personalSlug = generateSlug(8);
     let attempts = 0;
@@ -42,7 +46,11 @@ export class GuestsService {
       attempts++;
     }
 
-    const guest = await this.guestsRepo.create({ ...data, personalSlug });
+    const guest = await this.guestsRepo.create({
+      ...data,
+      personalSlug,
+      groupRole: data.groupRole || 'primary',
+    });
 
     if (userId) {
       await this.audit.log({
@@ -62,14 +70,23 @@ export class GuestsService {
     phone?: string;
     email?: string;
     customMessage?: string;
+    telegramUsername?: string;
+    groupKey?: string;
+    groupRole?: string;
+    partnerGuestId?: string;
   }>, userId?: string) {
-    const guestData = guests.map((g) => ({
+    const guestData = guests.map((g, index) => ({
       eventId,
       name: g.name,
       phone: g.phone,
       email: g.email,
       personalSlug: generateSlug(8),
       customMessage: g.customMessage,
+      telegramUsername: g.telegramUsername,
+      groupKey: g.groupKey,
+      groupRole: g.groupRole || 'primary',
+      partnerGuestId: g.partnerGuestId,
+      sortOrder: index,
     }));
 
     await this.guestsRepo.createMany(guestData);
@@ -134,15 +151,39 @@ export class GuestsService {
     const guest = await this.guestsRepo.findById(data.guestId);
     if (!guest) throw new NotFoundException('GUEST_NOT_FOUND');
 
-    const status = data.answer === 'yes' ? 'confirmed'
+    const rsvpStatus = data.answer === 'yes' ? 'confirmed'
       : data.answer === 'no' ? 'declined'
       : 'maybe';
 
-    await this.guestsRepo.update(data.guestId, { status });
+    await this.guestsRepo.update(data.guestId, { rsvpStatus });
     return this.guestsRepo.createRsvp(data);
   }
 
   async getGuestCount(eventId: string) {
     return this.guestsRepo.countByEventId(eventId);
+  }
+
+  // ─── V3: Group operations ──────────────────────────────────────────
+
+  async findGroupsByEventId(eventId: string) {
+    return this.guestsRepo.findGroupsByEventId(eventId);
+  }
+
+  // ─── V3: Send status tracking ──────────────────────────────────────
+
+  async updateSendStatus(
+    guestId: string,
+    channel: 'whatsapp' | 'telegram' | 'email',
+    status: string,
+    error?: string,
+  ) {
+    const guest = await this.guestsRepo.findById(guestId);
+    if (!guest) throw new NotFoundException('GUEST_NOT_FOUND');
+
+    return this.guestsRepo.updateSendStatus(guestId, channel, status, error);
+  }
+
+  async getSendStatusSummary(eventId: string) {
+    return this.guestsRepo.findSendStatusSummary(eventId);
   }
 }

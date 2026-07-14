@@ -18,6 +18,17 @@ export class TemplatesController {
     return this.templatesService.findAll(category);
   }
 
+  @Get('marketplace')
+  @ApiOperation({ summary: 'Get marketplace templates with ratings and download counts' })
+  @ApiQuery({ name: 'category', required: false })
+  @ApiQuery({ name: 'source', required: false, enum: ['original', 'cloned', 'imported'] })
+  async marketplace(
+    @Query('category') category?: string,
+    @Query('source') source?: string,
+  ) {
+    return this.templatesService.findMarketplace(category, source);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get template by ID with assets' })
   async findOne(@Param('id') id: string) {
@@ -51,6 +62,60 @@ export class TemplatesController {
   async delete(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.templatesService.delete(id, userId);
   }
+
+  // ─── V3: Template Cloning ──────────────────────────────────────────
+
+  @Post(':id/clone')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearerAuth')
+  @ApiOperation({ summary: 'Clone a template (creates a personal copy)' })
+  async clone(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    return this.templatesService.clone(id, userId);
+  }
+
+  @Post(':id/rate')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearerAuth')
+  @ApiOperation({ summary: 'Rate a template (1-5)' })
+  async rate(
+    @Param('id') id: string,
+    @Body() body: { rating: number },
+  ) {
+    return this.templatesService.updateRating(id, body.rating);
+  }
+
+  // ─── V3: Template Import/Export ────────────────────────────────────
+
+  @Post('import')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('bearerAuth')
+  @ApiOperation({ summary: 'Import template from JSON/HTML/ZIP (admin only)' })
+  async importTemplate(@CurrentUser('id') userId: string, @Body() body: any) {
+    // TODO: Implement template import (Etap 8)
+    return { message: 'Template import endpoint - will be implemented in Etap 8' };
+  }
+
+  @Get(':id/export')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('bearerAuth')
+  @ApiOperation({ summary: 'Export template as JSON (admin only)' })
+  async exportTemplate(@Param('id') id: string) {
+    const template = await this.templatesService.findById(id);
+    return {
+      template: {
+        name: template.name,
+        slug: template.slug,
+        description: template.description,
+        categoryId: template.categoryId,
+        canvasJson: template.canvasJson,
+        animationConfig: template.animationConfig,
+        designTokens: template.designTokens,
+        assets: template.assets,
+      },
+    };
+  }
+
+  // ─── Template Assets ────────────────────────────────────────────────
 
   @Post(':id/assets')
   @UseGuards(JwtAuthGuard, AdminGuard)

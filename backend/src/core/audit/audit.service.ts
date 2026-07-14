@@ -48,6 +48,28 @@ export enum AuditAction {
   // Invitation Links
   INVITATION_LINK_CREATE = 'invitation_link.create',
   INVITATION_LINK_VISIT = 'invitation_link.visit',
+
+  // Dictionary (V3)
+  DICTIONARY_CREATE = 'dictionary.create',
+  DICTIONARY_UPDATE = 'dictionary.update',
+  DICTIONARY_DELETE = 'dictionary.delete',
+
+  // App Settings (V3)
+  APP_SETTINGS_UPDATE = 'app_settings.update',
+
+  // Notifications (V3)
+  NOTIFICATION_SEND = 'notification.send',
+  NOTIFICATION_BROADCAST = 'notification.broadcast',
+  NOTIFICATION_CANCEL = 'notification.cancel',
+
+  // Template Cloning (V3)
+  TEMPLATE_CLONE = 'template.clone',
+  TEMPLATE_IMPORT = 'template.import',
+  TEMPLATE_EXPORT = 'template.export',
+
+  // Guest Import Excel (V3)
+  GUEST_IMPORT_EXCEL = 'guest.import_excel',
+  GUEST_EXPORT_EXCEL = 'guest.export_excel',
 }
 
 @Injectable()
