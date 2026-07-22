@@ -21,15 +21,27 @@ class GoogleDriveService:
         self._init_service()
 
     def _init_service(self):
-        if not self.creds_json:
-            logger.info("⚠️ [GOOGLE DRIVE] Environment credentials not set. Operating in Mock mode.")
+        import os
+        creds_data = None
+
+        if self.creds_json:
+            try:
+                if os.path.exists(self.creds_json):
+                    with open(self.creds_json, "r", encoding="utf-8") as f:
+                        creds_data = json.load(f)
+                else:
+                    creds_data = json.loads(self.creds_json)
+            except Exception as e:
+                logger.error(f"❌ [GOOGLE DRIVE SERVICE] Error parsing creds JSON: {e}")
+
+        if not creds_data:
+            logger.info("⚠️ [GOOGLE DRIVE] Environment credentials not set or invalid. Operating in Mock mode.")
             return
 
         try:
             from google.oauth2 import service_account
             from googleapiclient.discovery import build
             
-            creds_data = json.loads(self.creds_json)
             credentials = service_account.Credentials.from_service_account_info(
                 creds_data,
                 scopes=['https://www.googleapis.com/auth/drive.file']
@@ -40,16 +52,41 @@ class GoogleDriveService:
             logger.error(f"❌ [GOOGLE DRIVE SERVICE] Error initializing client: {str(e)}")
             self.service = None
 
+    def get_target_folder_id(self, folder: str, mime_type: str = "") -> Optional[str]:
+        folder_lower = folder.lower()
+        if "template" in folder_lower and ("photo" in folder_lower or "image" in mime_type):
+            return settings.DRIVE_FOLDER_TEMPLATES_PHOTOS or self.folder_id
+        elif "template" in folder_lower and ("video" in folder_lower or "video" in mime_type):
+            return settings.DRIVE_FOLDER_TEMPLATES_VIDEOS or self.folder_id
+        elif "template" in folder_lower and ("audio" in folder_lower or "music" in folder_lower or "audio" in mime_type):
+            return settings.DRIVE_FOLDER_TEMPLATES_AUDIOS or self.folder_id
+        elif "client" in folder_lower and ("photo" in folder_lower or "image" in mime_type):
+            return settings.DRIVE_FOLDER_CLIENT_PHOTOS or self.folder_id
+        elif "client" in folder_lower and ("video" in folder_lower or "video" in mime_type):
+            return settings.DRIVE_FOLDER_CLIENT_VIDEOS or self.folder_id
+        
+        # Exact category match check
+        folder_map = {
+            "templates_photos": settings.DRIVE_FOLDER_TEMPLATES_PHOTOS,
+            "templates_videos": settings.DRIVE_FOLDER_TEMPLATES_VIDEOS,
+            "templates_audios": settings.DRIVE_FOLDER_TEMPLATES_AUDIOS,
+            "client_photos": settings.DRIVE_FOLDER_CLIENT_PHOTOS,
+            "client_videos": settings.DRIVE_FOLDER_CLIENT_VIDEOS,
+        }
+        return folder_map.get(folder_lower) or self.folder_id
+
     async def upload_file(self, db: AsyncSession, file_name: str, content: bytes, mime_type: str, folder: str = "general") -> FileRecord:
         file_key = f"gdrive_{file_name.replace(' ', '_')}"
         public_url = f"https://drive.google.com/uc?id={file_key}&export=view"
+
+        target_folder = self.get_target_folder_id(folder, mime_type)
 
         if self.service:
             try:
                 from googleapiclient.http import MediaIoBaseUpload
                 file_metadata = {
                     'name': file_name,
-                    'parents': [self.folder_id] if self.folder_id else []
+                    'parents': [target_folder] if target_folder else []
                 }
                 media = MediaIoBaseUpload(io.BytesIO(content), mimetype=mime_type, resumable=True)
                 uploaded_file = self.service.files().create(

@@ -6,3 +6,6 @@ dist/
 *.log
 coverage/
 .nyc_output/
+*venv*
+*__pycache__*
+*.pyc
