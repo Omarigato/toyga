@@ -1,31 +1,24 @@
-FROM node:20-alpine AS builder
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY prisma ./prisma/
+# Prevent Python from writing .pyc files & enable unbuffered stdout
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-RUN npm ci
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend application code
 COPY . .
 
-RUN npx prisma generate
-RUN npm run build
+EXPOSE 8000
 
-# Production stage
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-COPY package*.json ./
-COPY prisma ./prisma/
-
-RUN npm ci --omit=dev
-
-COPY --from=builder /app/dist ./dist
-
-RUN npx prisma generate
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

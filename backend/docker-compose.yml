@@ -6,7 +6,7 @@ services:
     container_name: toyga-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: toyga
+      POSTGRES_DB: toyga_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -16,23 +16,26 @@ services:
       - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ../database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 10s
-      timeout: 5s
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d toyga_db']
+      interval: 5s
+      timeout: 3s
       retries: 5
 
-  app:
+  backend:
     build: .
     container_name: toyga-backend
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '8000:8000'
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/toyga
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
-      JWT_EXPIRES_IN: 7d
-      NODE_ENV: production
-      SWAGGER_ENABLED: false
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: toyga_db
+      SECRET_KEY: ${SECRET_KEY:-SUPER_SECRET_TOYGA_JWT_KEY_2026_PRODUCTION}
+      GOOGLE_DRIVE_CREDENTIALS_JSON: ${GOOGLE_DRIVE_CREDENTIALS_JSON:-}
+      GOOGLE_DRIVE_FOLDER_ID: ${GOOGLE_DRIVE_FOLDER_ID:-}
     depends_on:
       postgres:
         condition: service_healthy
