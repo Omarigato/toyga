@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
 
 from app.core.database import get_db
 from app.schemas import PaymentCreate, PaymentResponse
@@ -13,4 +14,14 @@ async def create_checkout(payload: PaymentCreate, db: AsyncSession = Depends(get
 
 @router.post("/{transaction_id}/confirm", response_model=PaymentResponse, summary="Confirm Payment Callback")
 async def confirm_payment(transaction_id: str, db: AsyncSession = Depends(get_db)):
+    return await payment_service.confirm_payment(db, transaction_id)
+
+@router.post("/webhook/kaspi", response_model=PaymentResponse, summary="Kaspi Payment Server-to-Server Webhook")
+async def kaspi_webhook(
+    transaction_id: str,
+    x_kaspi_signature: Optional[str] = Header(None),
+    db: AsyncSession = Depends(get_db)
+):
+    if not transaction_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing transaction_id")
     return await payment_service.confirm_payment(db, transaction_id)

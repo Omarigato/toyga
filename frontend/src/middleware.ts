@@ -10,13 +10,17 @@ export function middleware(request: NextRequest) {
       request.cookies.get("toyga_token")?.value ||
       request.cookies.get("tg_access_token")?.value;
 
-    // If in dev mode without token, allow smooth access with fallback OR redirect if explicitly unauthenticated
-    // In production, token cookie is checked
+    // Check if token exists in cookies; if absent in production mode, redirect to /login
+    if (!token && process.env.NODE_ENV === "production") {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   const response = NextResponse.next();
 
-  // Add Static Assets & API Cache Headers for High Performance
+  // Cache headers for static assets
   if (
     pathname.startsWith("/_next/static") ||
     pathname.endsWith(".png") ||

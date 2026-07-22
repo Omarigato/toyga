@@ -4,11 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
-import { useI18n } from "@/context/i18n-context";
-import { User, Mail, Lock, Phone } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function RegisterPage() {
-  const { t } = useI18n();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,79 +17,101 @@ export default function RegisterPage() {
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Тіркелу сәтті өтті!");
+    localStorage.setItem("toyga_token", "mock_jwt_token_2026");
+    localStorage.setItem("toyga_user_role", "user");
+    document.cookie = "toyga_token=mock_jwt_token_2026; path=/";
+    window.location.href = "/dashboard";
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#1A1A2E] text-white flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 max-w-md mx-auto w-full px-4 py-16 flex items-center justify-center">
-        <div className="w-full bg-gradient-to-b from-[#1c1c1e] to-[#121214] border border-amber-500/30 rounded-3xl p-8 shadow-2xl space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-serif font-bold text-white">Тіркелу</h1>
-            <p className="text-xs text-gray-400">TOYGA.KZ жүйесінде жаңа аккаунт ашыңыз</p>
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-16 flex items-center justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full items-center">
+          {/* Left Branding Panel */}
+          <div className="space-y-6 hidden md:block">
+            <div className="w-14 h-14 rounded-2xl bg-gold/20 border border-gold/40 flex items-center justify-center text-gold shadow-lg">
+              <Sparkles className="w-7 h-7" />
+            </div>
+            <h1 className="text-4xl font-serif font-bold text-white leading-tight">
+              TOYGA<span className="text-gold">.KZ</span> отбасына қосылыңыз
+            </h1>
+            <p className="text-sm text-white/70 leading-relaxed">
+              Тіркеліп, алғашқы цифрлық шақыруыңызды тегін жасап көріңіз.
+            </p>
+            <div className="flex items-center space-x-3 text-xs text-gold/90 font-medium">
+              <ShieldCheck className="w-4 h-4 text-gold" />
+              <span>Шексіз қонақтар тізімі мен автоматты RSVP</span>
+            </div>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div>
-              <label className="text-xs text-gray-400">Аты-жөніңіз (ФИО):</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Абылай Хан"
-                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
-              />
-            </div>
+          {/* Right Register Card */}
+          <Card hoverGlow className="w-full border-gold/30 p-2 sm:p-4">
+            <CardHeader className="text-center space-y-1">
+              <CardTitle className="text-2xl text-gold">Жаңа аккаунт ашу</CardTitle>
+              <CardDescription>Деректеріңізді енгізіп, жүйеге тіркеліңіз</CardDescription>
+            </CardHeader>
 
-            <div>
-              <label className="text-xs text-gray-400">Email мекенжайы:</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@toyga.kz"
-                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
-              />
-            </div>
+            <CardContent>
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs text-white/70">Аты-жөніңіз (ФИО):</label>
+                  <Input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Абылай Хан"
+                  />
+                </div>
 
-            <div>
-              <label className="text-xs text-gray-400">Телефон нөміріңіз:</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+7 707 123 45 67"
-                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-white/70">Email мекенжайы:</label>
+                  <Input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="user@toyga.kz"
+                  />
+                </div>
 
-            <div>
-              <label className="text-xs text-gray-400">Пароль:</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
-              />
-            </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-white/70">Телефон нөміріңіз:</label>
+                  <Input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+7 (707) 123-45-67"
+                  />
+                </div>
 
-            <button
-              type="submit"
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm shadow-xl shadow-amber-500/20 hover:scale-[1.02] transition-all"
-            >
-              Тіркелу
-            </button>
-          </form>
+                <div className="space-y-1">
+                  <label className="text-xs text-white/70">Пароль:</label>
+                  <Input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
 
-          <div className="text-center text-xs text-gray-400 pt-2">
-            Аккаунтыңыз бар ма?{" "}
-            <Link href="/login" className="text-amber-400 font-bold hover:underline">
-              Кіру
-            </Link>
-          </div>
+                <Button type="submit" variant="primary" size="lg" className="w-full">
+                  Тіркелу <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-xs text-white/60">
+                Аккаунтыңыз бар ма?{" "}
+                <Link href="/login" className="text-gold underline font-semibold hover:text-gold-deep">
+                  Кіру
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 

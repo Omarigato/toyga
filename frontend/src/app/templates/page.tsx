@@ -5,46 +5,119 @@ import Link from "next/link";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { useI18n } from "@/context/i18n-context";
-import { Eye, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { Eye, ArrowRight, Sparkles } from "lucide-react";
 
 export default function TemplatesPage() {
   const { t } = useI18n();
   const [selectedCat, setSelectedCat] = useState<string>("all");
 
-  const templates = [
-    { id: "1", name: "Алтын Шатыр Luxe", slug: "altyn-shatyr-luxe", category: "uylenu-toy", price: "4 990 ₸", tag: t("templates.tag_luxe"), bg: "from-amber-900/40 to-black" },
-    { id: "2", name: "Меруерт Нәзіктігі", slug: "meruert-naziktigi", category: "kyz-uzatu", price: "0 ₸", tag: t("templates.tag_free"), bg: "from-rose-900/40 to-black" },
-    { id: "3", name: "Құдалық Сый-Құрмет", slug: "kudalyk-syi", category: "kudalyk", price: "4 990 ₸", tag: t("templates.tag_classic"), bg: "from-amber-800/40 to-black" },
-    { id: "4", name: "Рамазан Ауызашар", slug: "ramazan-auyzashar", category: "auyzashar", price: "0 ₸", tag: t("templates.tag_free"), bg: "from-emerald-900/40 to-black" },
-    { id: "5", name: "Сәби Алғашқы Қадам", slug: "sabi-tsusakeser", category: "tsusakeser", price: "4 990 ₸", tag: t("templates.tag_luxe"), bg: "from-sky-900/40 to-black" }
+  const categories = [
+    { slug: "all", name: "Барлығы" },
+    { slug: "uylenu-toy", name: "Үйлену той" },
+    { slug: "kyz-uzatu", name: "Қыз ұзату" },
+    { slug: "kudalyk", name: "Құдалық" },
+    { slug: "auyzashar", name: "Ауызашар" },
+    { slug: "tsusakeser", name: "Тұсаукесер" },
   ];
 
-  const filtered = selectedCat === "all" ? templates : templates.filter((t) => t.category === selectedCat);
+  const templates = [
+    {
+      id: "1",
+      name: "Алтын Шатыр Luxe",
+      slug: "altyn-shatyr-luxe",
+      category: "uylenu-toy",
+      price: "4 990 ₸",
+      isPremium: true,
+      tag: "Премиум",
+      bg: "from-amber-900/60 to-[#1A1A2E]",
+    },
+    {
+      id: "2",
+      name: "Меруерт Нәзіктігі",
+      slug: "meruert-naziktigi",
+      category: "kyz-uzatu",
+      price: "0 ₸",
+      isPremium: false,
+      tag: "Тегін",
+      bg: "from-rose-950/60 to-[#1A1A2E]",
+    },
+    {
+      id: "3",
+      name: "Құдалық Сый-Құрмет",
+      slug: "kudalyk-syi",
+      category: "kudalyk",
+      price: "4 990 ₸",
+      isPremium: true,
+      tag: "Люкс",
+      bg: "from-amber-950/60 to-[#1A1A2E]",
+    },
+    {
+      id: "4",
+      name: "Рамазан Ауызашар",
+      slug: "ramazan-auyzashar",
+      category: "auyzashar",
+      price: "0 ₸",
+      isPremium: false,
+      tag: "Тегін",
+      bg: "from-emerald-950/60 to-[#1A1A2E]",
+    },
+    {
+      id: "5",
+      name: "Сәби Алғашқы Қадам",
+      slug: "sabi-tsusakeser",
+      category: "tsusakeser",
+      price: "4 990 ₸",
+      isPremium: true,
+      tag: "Премиум",
+      bg: "from-indigo-950/60 to-[#1A1A2E]",
+    },
+  ];
+
+  const filtered =
+    selectedCat === "all"
+      ? templates
+      : templates.filter((t) => t.category === selectedCat);
 
   return (
-    <div className="min-h-screen bg-[#000000] dark:bg-[#000000] light:bg-[#f5f5f7] text-white dark:text-white light:text-[#1d1d1f] flex flex-col font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-[#1A1A2E] text-white flex flex-col font-sans transition-colors duration-300">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+        <Breadcrumb
+          items={[
+            { label: "Басты бет", href: "/" },
+            { label: "Шаблондар маркетплейсі" },
+          ]}
+        />
+
         {/* Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight">{t("templates.title")}</h1>
-          <p className="text-sm text-gray-400 dark:text-gray-400 light:text-gray-600">{t("templates.subtitle")}</p>
+          <Badge variant="gold">Эксклюзивті каталог</Badge>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-gold">
+            Шаблон таңдаңыз
+          </h1>
+          <p className="text-sm text-white/60">
+            Барлық шаблондар музыкамен, 2GIS навигациясымен және RSVP жүйесімен қамтамасыз етілген.
+          </p>
         </div>
 
         {/* Category Filter Chips */}
         <div className="flex items-center justify-center flex-wrap gap-2">
-          {["all", "uylenu-toy", "kyz-uzatu", "kudalyk", "auyzashar", "tsusakeser"].map((cat) => (
+          {categories.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCat(cat)}
-              className={`px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider transition-all border ${
-                selectedCat === cat
-                  ? "bg-[#0071e3] text-white border-blue-400 shadow-lg shadow-blue-500/20 font-bold"
-                  : "bg-white/5 dark:bg-white/5 light:bg-white text-gray-400 dark:text-gray-400 light:text-gray-700 border-white/10 dark:border-white/10 light:border-black/10 hover:text-amber-400"
+              key={cat.slug}
+              onClick={() => setSelectedCat(cat.slug)}
+              className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all border ${
+                selectedCat === cat.slug
+                  ? "bg-gradient-to-r from-gold to-[#A68B4B] text-ink border-gold shadow-md font-bold"
+                  : "bg-[#252542] text-white/70 border-white/10 hover:border-gold/50 hover:text-white"
               }`}
             >
-              {cat === "all" ? t("templates.filter_all") : cat}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -52,50 +125,59 @@ export default function TemplatesPage() {
         {/* Templates Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((tmpl) => (
-            <div
+            <Card
               key={tmpl.id}
-              className="bg-gradient-to-b from-[#1c1c1e] to-[#121214] dark:from-[#1c1c1e] dark:to-[#121214] light:from-white light:to-stone-50 border border-white/10 dark:border-white/10 light:border-black/10 rounded-3xl overflow-hidden hover:border-amber-400/50 transition-all group flex flex-col justify-between shadow-xl"
+              hoverGlow
+              className="overflow-hidden flex flex-col justify-between border-gold/30"
             >
               {/* Card Banner */}
-              <div className={`h-64 bg-gradient-to-br ${tmpl.bg} p-6 flex flex-col justify-between relative`}>
-                <span className="self-end px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-semibold text-amber-400">
-                  {tmpl.tag}
-                </span>
+              <div
+                className={`h-64 bg-gradient-to-br ${tmpl.bg} p-6 flex flex-col justify-between relative`}
+              >
+                <div className="flex justify-between items-center w-full">
+                  <Badge variant={tmpl.isPremium ? "gold" : "teal"}>
+                    {tmpl.tag}
+                  </Badge>
+                  <Sparkles className="w-5 h-5 text-gold" />
+                </div>
 
-                <div className="text-center space-y-1">
-                  <span className="text-xs uppercase tracking-widest text-amber-400 font-bold">TOYGA LUXE</span>
-                  <h3 className="text-2xl font-serif font-bold text-white">{tmpl.name}</h3>
+                <div className="text-center space-y-1 my-auto">
+                  <span className="text-xs uppercase tracking-widest text-gold/90 font-bold">
+                    TOYGA LUXE
+                  </span>
+                  <h3 className="text-2xl font-serif font-bold text-white">
+                    {tmpl.name}
+                  </h3>
                 </div>
               </div>
 
               {/* Actions & Pricing */}
-              <div className="p-6 flex items-center justify-between border-t border-white/10 dark:border-white/10 light:border-black/10">
+              <CardContent className="p-6 flex items-center justify-between border-t border-white/10 pt-6">
                 <div>
-                  <span className="text-xs text-gray-400">{t("templates.price_label")}</span>
-                  <p className="text-xl font-bold font-serif text-amber-500">{tmpl.price}</p>
+                  <span className="text-xs text-white/50">Бағасы:</span>
+                  <p className="text-xl font-bold font-serif text-gold">
+                    {tmpl.price}
+                  </p>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  {/* Demo Link */}
                   <Link
-                    href={`/templates/demo/${tmpl.slug}`}
-                    className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-amber-400 transition-all"
-                    title={t("templates.btn_demo")}
+                    href={`/templates/${tmpl.slug}`}
+                    className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-gold transition-all"
+                    title="Демо көру"
                   >
                     <Eye className="w-4 h-4" />
                   </Link>
 
-                  {/* Select Template CTA */}
-                  <Link
-                    href={`/wizard?template=${tmpl.id}`}
-                    className="px-5 py-2.5 rounded-full bg-[#0071e3] hover:bg-[#0066cc] text-white font-bold text-xs flex items-center space-x-1 transition-all shadow-md"
-                  >
-                    <span>{t("templates.btn_select")}</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <Link href={`/wizard?template=${tmpl.id}`}>
+                    <Button variant="primary" size="sm" className="text-xs">
+                      <span>Таңдау</span>
+                      <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
                   </Link>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </main>

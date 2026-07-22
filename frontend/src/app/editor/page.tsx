@@ -5,123 +5,213 @@ import Link from "next/link";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
 import { useI18n } from "@/context/i18n-context";
-import { Save, Layers, Palette, Type, Music, Image as ImageIcon, Eye, ArrowLeft, Sparkles } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Dock } from "@/components/ui/dock";
+import { Save, Type, Palette, Music, Image as ImageIcon, Layout, ArrowLeft, Sparkles, Check } from "lucide-react";
 
 export default function CanvasEditorPage() {
   const { t } = useI18n();
-  const [activeTab, setActiveTab] = useState<"text" | "color" | "music" | "bg">("text");
+  const [activeDock, setActiveDock] = useState<string>("text");
+  const [saved, setSaved] = useState(false);
   const [canvasState, setCanvasState] = useState({
     title: "Омар & Маржан",
-    subtitle: "Үйлену тойына шақыру",
+    subtitle: "Үйлену тойына арнайы шақыру",
     date: "25 Тамыз 2026",
-    color: "#C9A227",
-    font: "Playfair Display",
-    background: "dark"
+    venue: "Altyn Shatyr Grand Ballroom",
+    accentColor: "#C9A96E",
+    fontFamily: "Playfair Display",
+    musicTitle: "Үйлену той вальсі",
   });
 
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const dockItems = [
+    {
+      id: "text",
+      label: "Мәтін",
+      icon: <Type className="w-5 h-5" />,
+      active: activeDock === "text",
+      onClick: () => setActiveDock("text"),
+    },
+    {
+      id: "color",
+      label: "Түс пен Шрифт",
+      icon: <Palette className="w-5 h-5" />,
+      active: activeDock === "color",
+      onClick: () => setActiveDock("color"),
+    },
+    {
+      id: "music",
+      label: "Музыка",
+      icon: <Music className="w-5 h-5" />,
+      active: activeDock === "music",
+      onClick: () => setActiveDock("music"),
+    },
+    {
+      id: "photo",
+      label: "Галерея",
+      icon: <ImageIcon className="w-5 h-5" />,
+      active: activeDock === "photo",
+      onClick: () => setActiveDock("photo"),
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0f0f10] text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#1A1A2E] text-white flex flex-col font-sans pb-24">
       <Navbar />
 
       {/* Editor Top Toolbar */}
-      <div className="bg-black/40 backdrop-blur-md border-b border-white/10 px-6 py-3 flex items-center justify-between">
+      <div className="bg-[#141426]/90 backdrop-blur-xl border-b border-gold/20 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Link href="/dashboard" className="text-xs text-gray-400 hover:text-amber-400 flex items-center space-x-1">
+          <Link href="/dashboard" className="text-xs text-white/60 hover:text-gold flex items-center space-x-1">
             <ArrowLeft className="w-4 h-4" />
             <span>Кабинетке қайту</span>
           </Link>
-          <span className="text-gray-600">|</span>
-          <span className="text-xs font-serif font-bold text-amber-400">Live Canvas Editor v3</span>
+          <span className="text-white/20">|</span>
+          <span className="text-xs font-serif font-bold text-gold flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5" /> Interactive Canvas Editor v3
+          </span>
         </div>
 
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => alert("Дизайн сәтті сақталды!")}
-            className="px-5 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs shadow-lg flex items-center space-x-1 transition-all"
-          >
-            <Save className="w-4 h-4" />
-            <span>Сақтау</span>
-          </button>
+          <Button variant="primary" size="sm" onClick={handleSave} className="text-xs">
+            {saved ? (
+              <>
+                <Check className="w-4 h-4 mr-1 text-teal-300" /> Сақталды!
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-1" /> Сақтау
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
-      {/* Editor Main Workspace (Split View) */}
-      <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 sm:p-6 gap-6">
-        {/* Left Inspector Sidebar */}
-        <div className="w-full lg:w-80 bg-gradient-to-b from-[#1c1c1e] to-[#121214] border border-white/10 rounded-3xl p-6 space-y-6 flex-shrink-0">
-          <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 text-xs font-semibold">
-            <button
-              onClick={() => setActiveTab("text")}
-              className={`flex-1 py-2 rounded-xl transition-all ${activeTab === "text" ? "bg-amber-500 text-black" : "text-gray-400"}`}
-            >
-              Мәтін
-            </button>
-            <button
-              onClick={() => setActiveTab("color")}
-              className={`flex-1 py-2 rounded-xl transition-all ${activeTab === "color" ? "bg-amber-500 text-black" : "text-gray-400"}`}
-            >
-              Түс
-            </button>
-            <button
-              onClick={() => setActiveTab("music")}
-              className={`flex-1 py-2 rounded-xl transition-all ${activeTab === "music" ? "bg-amber-500 text-black" : "text-gray-400"}`}
-            >
-              Әуен
-            </button>
-          </div>
+      {/* Editor Workspace */}
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Inspector Panel */}
+        <Card className="lg:col-span-4 p-6 border-gold/30 space-y-6">
+          <h3 className="font-serif font-bold text-lg text-gold flex items-center gap-2">
+            <Layout className="w-5 h-5" /> Инспектор свойств
+          </h3>
 
-          {activeTab === "text" && (
-            <div className="space-y-4 text-xs">
-              <div>
-                <label className="text-gray-400 font-medium">Басты атау:</label>
-                <input
+          {activeDock === "text" && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs text-white/70">Басты атау (Тақырып):</label>
+                <Input
                   value={canvasState.title}
                   onChange={(e) => setCanvasState({ ...canvasState, title: e.target.value })}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 mt-1 text-white"
                 />
               </div>
-              <div>
-                <label className="text-gray-400 font-medium">Субтитр:</label>
-                <input
+
+              <div className="space-y-1">
+                <label className="text-xs text-white/70">Субтитр:</label>
+                <Input
                   value={canvasState.subtitle}
                   onChange={(e) => setCanvasState({ ...canvasState, subtitle: e.target.value })}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 mt-1 text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-white/70">Өтетін күні:</label>
+                <Input
+                  value={canvasState.date}
+                  onChange={(e) => setCanvasState({ ...canvasState, date: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs text-white/70">Ресторан / Орны:</label>
+                <Input
+                  value={canvasState.venue}
+                  onChange={(e) => setCanvasState({ ...canvasState, venue: e.target.value })}
                 />
               </div>
             </div>
           )}
 
-          {activeTab === "color" && (
-            <div className="space-y-3">
-              <label className="text-xs text-gray-400">Акцент түсін таңдаңыз:</label>
-              <div className="flex gap-3">
-                {["#C9A227", "#D8A39D", "#0071E3", "#10B981", "#E11D48"].map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setCanvasState({ ...canvasState, color: c })}
-                    style={{ backgroundColor: c }}
-                    className="w-8 h-8 rounded-full border-2 border-white/40 hover:scale-110 transition-transform"
-                  />
-                ))}
+          {activeDock === "color" && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs text-white/70">Акцент түсі:</label>
+                <div className="flex items-center gap-3">
+                  {["#C9A96E", "#D4848C", "#5A8A7A", "#C46B7A", "#A68B4B"].map((clr) => (
+                    <button
+                      key={clr}
+                      onClick={() => setCanvasState({ ...canvasState, accentColor: clr })}
+                      style={{ backgroundColor: clr }}
+                      className={`w-8 h-8 rounded-full border-2 transition-transform ${
+                        canvasState.accentColor === clr ? "scale-110 border-white" : "border-transparent"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           )}
-        </div>
 
-        {/* Middle Live Invitation Canvas Viewport */}
-        <div className="flex-1 bg-gradient-to-b from-[#18181a] to-[#0c0c0d] border border-amber-500/20 rounded-3xl p-8 flex items-center justify-center min-h-[500px] relative shadow-2xl">
-          <div className="w-full max-w-sm bg-[#141416] border border-amber-500/40 rounded-3xl p-8 text-center space-y-6 shadow-2xl">
-            <Sparkles className="w-10 h-10 mx-auto text-amber-400" />
-            <span style={{ color: canvasState.color }} className="text-xs uppercase tracking-widest font-bold">
-              {canvasState.subtitle}
-            </span>
-            <h2 className="text-4xl font-serif font-bold text-white">{canvasState.title}</h2>
-            <p className="text-xs text-gray-400">{canvasState.date}</p>
+          {activeDock === "music" && (
+            <div className="space-y-3">
+              <label className="text-xs text-white/70">Фондық әуен таңдау:</label>
+              {["Үйлену той вальсі", "Қыз ұзату әні", "Қазақша рояль"].map((m) => (
+                <div
+                  key={m}
+                  onClick={() => setCanvasState({ ...canvasState, musicTitle: m })}
+                  className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                    canvasState.musicTitle === m
+                      ? "border-gold bg-gold/10 text-gold font-bold"
+                      : "border-white/10 text-white/70 hover:bg-white/5"
+                  }`}
+                >
+                  {m}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeDock === "photo" && (
+            <div className="p-4 rounded-xl border border-dashed border-white/20 text-center text-xs text-white/50">
+              Галереяға фотосуреттер жүктеу үшін "Шақыру жасау" шеберіне (Wizard) өтіңіз.
+            </div>
+          )}
+        </Card>
+
+        {/* Live Canvas Preview */}
+        <div className="lg:col-span-8 flex justify-center">
+          <div className="w-full max-w-sm bg-[#21213B] border border-gold/40 rounded-3xl p-6 shadow-2xl space-y-6 text-center gold-border-glow">
+            <div className="w-14 h-14 rounded-full bg-gold/20 border border-gold/40 mx-auto flex items-center justify-center text-gold">
+              <Sparkles className="w-7 h-7" />
+            </div>
+
+            <div className="space-y-2">
+              <Badge variant="gold">{canvasState.subtitle}</Badge>
+              <h1 className="text-3xl font-serif font-bold" style={{ color: canvasState.accentColor }}>
+                {canvasState.title}
+              </h1>
+              <p className="text-xs text-white/60">LIVE CANVAS PREVIEW</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#1A1A2E] border border-white/10 text-xs space-y-2 text-left">
+              <p className="text-white/50">Күні:</p>
+              <p className="font-semibold text-white">{canvasState.date}</p>
+              <p className="text-white/50 pt-2">Мекенжай:</p>
+              <p className="font-semibold text-white">{canvasState.venue}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <Footer />
+      {/* Floating Bottom Dock */}
+      <Dock items={dockItems} />
     </div>
   );
 }

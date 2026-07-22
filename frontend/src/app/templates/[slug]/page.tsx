@@ -4,177 +4,187 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useI18n } from "@/context/i18n-context";
-import { Heart, Calendar, MapPin, Music, Play, Pause, CheckCircle2, ArrowLeft, ArrowRight, Sparkles, Navigation } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { AudioPlayer } from "@/components/ui/audio-player";
+import { Countdown } from "@/components/ui/countdown";
+import { MapEmbed } from "@/components/ui/map-embed";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Heart, Calendar, ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 
 export default function TemplateDemoPage() {
   const params = useParams();
-  const { lang, setLang, t } = useI18n();
-
   const slug = (params?.slug as string) || "altyn-shatyr-luxe";
-  const [isPlaying, setIsPlaying] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const [rsvpDialogOpen, setRsvpDialogOpen] = useState(false);
   const [rsvpStatus, setRsvpStatus] = useState<"accepted" | "declined" | "pending">("pending");
   const [guestsCount, setGuestsCount] = useState<number>(1);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  const handleSubmitRSVP = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => {
+      setRsvpDialogOpen(false);
+    }, 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0d0d0e] text-white flex flex-col items-center justify-center p-4 relative font-sans">
-      {/* Back to Marketplace Header bar */}
-      <div className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between bg-black/60 backdrop-blur-md p-3 rounded-full border border-white/20">
-        <Link href="/marketplace" className="flex items-center space-x-2 text-xs font-semibold text-gray-300 hover:text-amber-400">
+    <div className="min-h-screen bg-[#1A1A2E] text-white flex flex-col items-center justify-center p-4 relative font-sans">
+      {/* Back & Top Bar */}
+      <div className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between bg-[#141426]/90 backdrop-blur-xl p-3 rounded-full border border-gold/30 shadow-2xl">
+        <Link href="/templates" className="flex items-center space-x-2 text-xs font-semibold text-white/80 hover:text-gold">
           <ArrowLeft className="w-4 h-4" />
-          <span>Маркетплейске кайту</span>
+          <span>Маркетплейске қайту</span>
         </Link>
 
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-semibold"
-          >
-            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isPlaying ? "Музыка тоқтату" : "Музыка қосу"}</span>
-          </button>
+          <AudioPlayer title="Үйлену той вальсі" autoPlay={envelopeOpen} />
 
-          <Link
-            href={`/wizard?template=${slug}`}
-            className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs shadow-lg shadow-amber-500/20 hover:scale-105 transition-all flex items-center space-x-1"
-          >
-            <span>Осы шаблонды таңдау</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+          <Link href={`/wizard?template=${slug}`}>
+            <Button variant="primary" size="sm" className="text-xs hidden sm:flex">
+              <span>Осы шаблонды таңдау</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
           </Link>
         </div>
       </div>
 
-      {/* Main Luxury Envelope & Interactive Digital Invitation Demo */}
+      {/* Main Luxury Envelope */}
       {!envelopeOpen ? (
         <div className="max-w-md w-full text-center space-y-6 pt-16">
-          <div
+          <Card
             onClick={() => setEnvelopeOpen(true)}
-            className="p-10 rounded-3xl bg-gradient-to-b from-[#221f19] to-[#14120e] border border-amber-500/40 shadow-2xl space-y-6 cursor-pointer group hover:scale-105 transition-all"
+            hoverGlow
+            className="p-10 border-gold/50 shadow-2xl space-y-6 cursor-pointer group hover:scale-105 transition-all text-center bg-gradient-to-b from-[#252542] to-[#1A1A2E]"
           >
-            <div className="w-20 h-20 rounded-full bg-amber-500/20 border border-amber-500/60 mx-auto flex items-center justify-center text-amber-400 group-hover:rotate-12 transition-transform">
-              <Heart className="w-10 h-10 fill-amber-400/20" />
+            <div className="w-20 h-20 rounded-full bg-gold/20 border border-gold/60 mx-auto flex items-center justify-center text-gold group-hover:rotate-12 transition-transform shadow-lg">
+              <Heart className="w-10 h-10 fill-gold/20" />
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs uppercase tracking-widest text-amber-400 font-bold">Демо режим</span>
-              <h1 className="text-3xl font-serif font-bold text-white">Омар & Маржан</h1>
-              <p className="text-xs text-gray-400">Шақыру конвертін ашу үшін басыңыз &rarr;</p>
+              <Badge variant="gold">Эксклюзивті шақыру</Badge>
+              <h1 className="text-3xl font-serif font-bold text-gold">Омар & Маржан</h1>
+              <p className="text-xs text-white/60">Шақыру конвертін ашу үшін басыңыз &rarr;</p>
             </div>
-          </div>
+          </Card>
         </div>
       ) : (
-        <div className="max-w-md w-full bg-gradient-to-b from-[#1c1c1e] to-[#121214] border border-amber-500/30 rounded-3xl p-6 shadow-2xl space-y-6 text-center pt-20 animate-fadeIn">
+        <div className="max-w-md w-full bg-[#21213B] border border-gold/40 rounded-3xl p-6 shadow-2xl space-y-8 text-center pt-20 gold-border-glow">
           {/* Header Ornament */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <div className="w-16 h-16 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center text-gold shadow-md">
               <Sparkles className="w-8 h-8" />
             </div>
           </div>
 
           <div>
-            <span className="text-xs uppercase tracking-widest text-amber-400 font-semibold">
-              Үйлену тойына шақыру
-            </span>
-            <h1 className="text-3xl font-serif font-bold text-white mt-1">
+            <Badge variant="gold">Үйлену тойына шақыру</Badge>
+            <h1 className="text-4xl font-serif font-bold text-gold mt-2">
               Омар & Маржан
             </h1>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm text-white/70 mt-2">
               Сізді қуанышымызға ортақ болуға шақырамыз!
             </p>
           </div>
 
-          {/* Event Details */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-3 text-left">
-            <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-amber-400" />
-              <div>
-                <p className="text-xs text-gray-400">Күні мен уақыты</p>
-                <p className="text-sm font-semibold">25 Тамыз 2026, 18:00</p>
-              </div>
+          {/* Countdown Component */}
+          <Countdown targetDate="2026-08-25T18:00:00" />
+
+          {/* Location Component */}
+          <MapEmbed
+            venueName="Altyn Shatyr Grand Ballroom"
+            address="Алматы қ., Әл-Фараби даңғылы, 77/7"
+            gisUrl="https://2gis.kz"
+            yandexUrl="https://yandex.kz/maps"
+          />
+
+          {/* RSVP CTA */}
+          <Card className="p-6 space-y-4 border-gold/30 bg-[#1A1A2E]/80">
+            <h3 className="font-serif font-bold text-lg text-gold">Тойға қатысуыңызды растаңыз</h3>
+            <p className="text-xs text-white/60">Жауабыңызды 15 тамызға дейін күтеміз</p>
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full"
+              onClick={() => setRsvpDialogOpen(true)}
+            >
+              Жауап беру (RSVP)
+            </Button>
+          </Card>
+        </div>
+      )}
+
+      {/* RSVP Dialog */}
+      <Dialog open={rsvpDialogOpen} onOpenChange={setRsvpDialogOpen}>
+        <DialogContent className="bg-[#1A1A2E] border-gold/40">
+          <DialogHeader>
+            <DialogTitle>RSVP жауап беру</DialogTitle>
+            <DialogDescription>
+              Омар мен Маржанның тойына қатысуыңызды белгілеңіз
+            </DialogDescription>
+          </DialogHeader>
+
+          {submitted ? (
+            <div className="p-6 text-center space-y-3">
+              <CheckCircle2 className="w-12 h-12 text-teal-400 mx-auto" />
+              <h4 className="text-lg font-bold text-white">Жауабыңыз қабылданды!</h4>
+              <p className="text-xs text-white/60">Рахмет, тойда кездескенше!</p>
             </div>
-
-            <div className="flex items-center justify-between border-t border-white/5 pt-2">
-              <div className="flex items-center space-x-3">
-                <MapPin className="w-5 h-5 text-amber-400" />
-                <div>
-                  <p className="text-xs text-gray-400">Мекенжай</p>
-                  <p className="text-sm font-semibold">"Алтын Шатыр Luxe" Рестораны</p>
-                </div>
-              </div>
-
-              <a
-                href="https://2gis.kz/astana"
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold flex items-center space-x-1 hover:bg-emerald-500 hover:text-black transition-all"
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                <span>2GIS</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Demo RSVP Form */}
-          {!submitted ? (
-            <div className="space-y-4 text-left border-t border-white/10 pt-4">
-              <p className="text-sm font-medium text-amber-400 text-center">
-                Тойға қатысуыңызды растаңыз:
-              </p>
-
+          ) : (
+            <form onSubmit={handleSubmitRSVP} className="space-y-4 pt-2">
               <div className="grid grid-cols-2 gap-3">
-                <button
+                <Button
                   type="button"
+                  variant={rsvpStatus === "accepted" ? "primary" : "outline"}
                   onClick={() => setRsvpStatus("accepted")}
-                  className={`py-3 rounded-2xl text-xs font-bold border transition-all ${
-                    rsvpStatus === "accepted" ? "bg-amber-500 text-black border-amber-400" : "bg-white/5 text-gray-300 border-white/10"
-                  }`}
+                  className="w-full text-xs"
                 >
-                  Иә, барамын
-                </button>
-                <button
+                  Келемін
+                </Button>
+                <Button
                   type="button"
+                  variant={rsvpStatus === "declined" ? "destructive" : "outline"}
                   onClick={() => setRsvpStatus("declined")}
-                  className={`py-3 rounded-2xl text-xs font-bold border transition-all ${
-                    rsvpStatus === "declined" ? "bg-rose-500 text-white border-rose-400" : "bg-white/5 text-gray-300 border-white/10"
-                  }`}
+                  className="w-full text-xs"
                 >
-                  Бара алмаймын
-                </button>
+                  Келе алмаймын
+                </Button>
               </div>
 
               {rsvpStatus === "accepted" && (
                 <div className="space-y-1">
-                  <label className="text-xs text-gray-400">Қанша адам келесіздер?</label>
-                  <select
+                  <label className="text-xs text-white/70">Қонақтар саны:</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={5}
                     value={guestsCount}
-                    onChange={(e) => setGuestsCount(Number(e.target.value))}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-xs text-white"
-                  >
-                    <option value={1} className="bg-zinc-900">1 адам</option>
-                    <option value={2} className="bg-zinc-900">2 адам (+1)</option>
-                    <option value={3} className="bg-zinc-900">3 адам (Семья)</option>
-                  </select>
+                    onChange={(e) => setGuestsCount(parseInt(e.target.value) || 1)}
+                  />
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => setSubmitted(true)}
-                className="w-full py-3 rounded-2xl bg-amber-500 text-black font-bold text-xs shadow-lg shadow-amber-500/20"
-              >
-                Жауапты жіберу (Демо)
-              </button>
-            </div>
-          ) : (
-            <div className="p-4 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold space-y-1">
-              <CheckCircle2 className="w-8 h-8 mx-auto" />
-              <p>Демо RSVP жауабыңыз тіркелді!</p>
-            </div>
+              <div className="space-y-1">
+                <label className="text-xs text-white/70">Ізгі тілегіңіз:</label>
+                <Textarea
+                  placeholder="Жас жубайларға ақ тілек..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+
+              <Button type="submit" variant="primary" className="w-full">
+                Жіберу
+              </Button>
+            </form>
           )}
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

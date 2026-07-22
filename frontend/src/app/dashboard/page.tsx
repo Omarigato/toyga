@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { Navbar } from "@/components/ui/Navbar";
-import { Footer } from "@/components/ui/Footer";
-import { useI18n } from "@/context/i18n-context";
-import { Plus, Calendar, Users, Share2, ExternalLink, CreditCard, Sparkles } from "lucide-react";
+import { DashboardSidebar } from "@/widgets/dashboard-sidebar";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { QRCodeCard } from "@/components/ui/qr-code";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Plus, Calendar, Users, ExternalLink, QrCode, Share2, Edit3, Sparkles } from "lucide-react";
 
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const [selectedQrUrl, setSelectedQrUrl] = useState<string | null>(null);
 
   const userEvents = [
     {
@@ -16,88 +19,130 @@ export default function DashboardPage() {
       title: "Омар & Маржан Үйлену Тойы",
       type: "Үйлену той",
       date: "25 Тамыз 2026",
-      status: "Жарияланған",
+      status: "published",
+      statusText: "Жарияланған",
       isPaid: true,
       guestsCount: 142,
-      slug: "omar-marzhan"
-    }
+      slug: "omar-marzhan",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans">
-      <Navbar />
+    <div className="min-h-screen bg-[#1A1A2E] text-white flex flex-row font-sans">
+      {/* Sidebar */}
+      <DashboardSidebar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
-        {/* Dashboard Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 sm:p-10 overflow-y-auto space-y-8">
+        {/* Header Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6">
           <div>
-            <h1 className="text-3xl font-serif font-bold text-white">Мои мероприятия</h1>
-            <p className="text-sm text-gray-400 mt-1">Барлық жасалған той-шақыруларыңыз бен қонақтар статистикасы</p>
+            <h1 className="text-3xl font-serif font-bold text-gold">Мои мероприятия</h1>
+            <p className="text-sm text-white/60 mt-1">
+              Барлық жасалған той-шақыруларыңыз мен қонақтар статистикасы
+            </p>
           </div>
 
-          <Link
-            href="/wizard"
-            className="flex items-center space-x-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm hover:scale-105 shadow-lg shadow-amber-500/20 transition-all"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Жаңа шақыру жасау</span>
+          <Link href="/wizard">
+            <Button variant="primary" size="lg" className="shadow-lg">
+              <Plus className="w-5 h-5 mr-2" /> Жаңа шақыру жасау
+            </Button>
           </Link>
         </div>
 
-        {/* User Events List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {userEvents.map((ev) => (
-            <div
-              key={ev.id}
-              className="p-8 rounded-3xl bg-gradient-to-b from-[#1c1c1e] to-[#121214] border border-amber-500/30 shadow-2xl space-y-6 flex flex-col justify-between"
-            >
-              <div className="space-y-4">
+        {/* User Events Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {userEvents.map((ev) => {
+            const publicUrl = `https://toyga.kz/i/${ev.slug}/demo`;
+
+            return (
+              <Card key={ev.id} hoverGlow className="p-6 border-gold/30 space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold">
-                    {ev.status}
+                  <Badge variant="teal">{ev.statusText}</Badge>
+                  <span className="text-xs text-gold font-semibold uppercase tracking-wider">
+                    {ev.type}
                   </span>
-                  <span className="text-xs text-amber-400 font-bold uppercase tracking-widest">{ev.type}</span>
                 </div>
 
-                <h3 className="text-2xl font-serif font-bold text-white">{ev.title}</h3>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-serif font-bold text-white">{ev.title}</h3>
+                  <p className="text-xs text-white/50">ID: {ev.id} · Тариф: Премиум</p>
+                </div>
 
-                <div className="grid grid-cols-2 gap-4 text-xs text-gray-300 bg-white/5 p-4 rounded-2xl border border-white/10">
+                <div className="grid grid-cols-2 gap-4 text-xs text-white/80 bg-[#1A1A2E] p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-amber-400" />
+                    <Calendar className="w-4 h-4 text-gold" />
                     <span>{ev.date}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Users className="w-4 h-4 text-amber-400" />
+                    <Users className="w-4 h-4 text-gold" />
                     <span>{ev.guestsCount} қонақ тіркелді</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-                <Link
-                  href={`/crm/${ev.id}`}
-                  className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs text-center transition-all flex items-center justify-center space-x-1"
-                >
-                  <Users className="w-4 h-4 text-amber-400" />
-                  <span>Қонақтар CRM</span>
-                </Link>
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
+                  <Link href={`/crm/${ev.id}`} className="flex-1">
+                    <Button variant="secondary" size="sm" className="w-full text-xs">
+                      <Users className="w-4 h-4 mr-1 text-gold" /> Қонақтар CRM
+                    </Button>
+                  </Link>
 
-                <Link
-                  href={`/i/${ev.slug}/erzhan`}
-                  target="_blank"
-                  className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs text-center transition-all flex items-center justify-center space-x-1"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  <span>Шақыруды көру</span>
-                </Link>
-              </div>
-            </div>
-          ))}
+                  <Link href="/editor" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full text-xs">
+                      <Edit3 className="w-4 h-4 mr-1" /> Редактор
+                    </Button>
+                  </Link>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedQrUrl(publicUrl)}
+                    title="QR код"
+                  >
+                    <QrCode className="w-4 h-4 text-gold" />
+                  </Button>
+
+                  <Link href={`/i/${ev.slug}/erzhan`} target="_blank">
+                    <Button variant="primary" size="sm" className="text-xs">
+                      <ExternalLink className="w-4 h-4 mr-1" /> Көру
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </main>
 
-      <Footer />
+      {/* QR Code Dialog */}
+      <Dialog open={!!selectedQrUrl} onOpenChange={() => setSelectedQrUrl(null)}>
+        <DialogContent className="bg-[#1A1A2E] border-gold/40 max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Шақыру QR коды</DialogTitle>
+            <DialogDescription>
+              QR кодты сканерлеп немесе WhatsApp арқылы шақыру сілтемесін бөлісіңіз
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedQrUrl && (
+            <div className="py-4 flex flex-col items-center space-y-4">
+              <QRCodeCard value={selectedQrUrl} size={200} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedQrUrl);
+                  alert("Сілтеме көшірілді!");
+                }}
+                className="w-full text-xs"
+              >
+                <Share2 className="w-4 h-4 mr-2" /> Сілтемені көшіру
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,25 +1,30 @@
 import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: { default: "TOYGA.KZ — Luxury Digital Invitations", template: "%s | TOYGA.KZ" },
-  description: "Создавайте эксклюзивные цифровые приглашения на той в стиле Apple",
+  title: { default: "TOYGA.KZ — Цифрлық шақыру платформысы", template: "%s | TOYGA.KZ" },
+  description: "Премиум цифровые пригласительные на свадьбу, кыз узату, кудалык в Казахстане",
   icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="kk" className="antialiased dark" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen bg-primary text-primary transition-colors duration-300">
+    <html lang="kk" className={`${inter.variable} ${playfair.variable} antialiased dark`} suppressHydrationWarning>
+      <body className="min-h-screen bg-ink text-white font-sans transition-colors duration-300">
         <Providers>{children}</Providers>
       </body>
     </html>
