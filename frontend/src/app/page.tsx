@@ -1,152 +1,143 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
-import { Navbar } from "@/widgets/navbar";
-import { Footer } from "@/widgets/footer";
-import { Button } from "@/shared/ui/button";
-import { useI18n } from "@/shared/i18n/provider";
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Heart, Palette, Users, Sparkles, Star } from "lucide-react";
+import { Navbar } from "@/components/ui/Navbar";
+import { Footer } from "@/components/ui/Footer";
+import { useI18n } from "@/context/i18n-context";
+import { Sparkles, ArrowRight, Heart, CheckCircle2 } from "lucide-react";
 
-const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } } };
-const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
-
-export default function HomePage() {
+export default function LandingPage() {
   const { t } = useI18n();
 
   const categories = [
-    { href: "/wedding", title: "Той шақыру", desc: "Свадебные приглашения", icon: Heart, color: "from-rose-50 to-pink-50", accent: "text-rose-500" },
-    { href: "/qyz-uzaty", title: "Қыз ұзату", desc: "Приглашения на кыз узату", icon: Star, color: "from-emerald-50 to-teal-50", accent: "text-emerald-600" },
-    { href: "/sundet-toy", title: "Сүндет той", desc: "Приглашения на сүннет той", icon: Sparkles, color: "from-blue-50 to-indigo-50", accent: "text-blue-600" },
-  ];
-
-  const steps = [
-    { step: "01", title: "Выберите шаблон", desc: "Красивые дизайны для любого торжества" },
-    { step: "02", title: "Настройте дизайн", desc: "Добавьте фото, текст и детали" },
-    { step: "03", title: "Поделитесь с гостями", desc: "Отправьте ссылку или скачайте картинку" },
+    { name: t("categories.uylenu"), slug: "uylenu-toy", bg: "from-amber-500/20 to-amber-900/10", border: "border-amber-500/30" },
+    { name: t("categories.kyz_uzatu"), slug: "kyz-uzatu", bg: "from-rose-500/20 to-rose-900/10", border: "border-rose-500/30" },
+    { name: t("categories.kudalyk"), slug: "kudalyk", bg: "from-amber-600/20 to-amber-950/10", border: "border-amber-600/30" },
+    { name: t("categories.auyzashar"), slug: "auyzashar", bg: "from-emerald-500/20 to-emerald-900/10", border: "border-emerald-500/30" },
+    { name: t("categories.tsusakeser"), slug: "tsusakeser", bg: "from-sky-500/20 to-sky-900/10", border: "border-sky-500/30" },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-primary text-primary flex flex-col font-sans transition-colors duration-300">
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-stone-50 to-white">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-[var(--color-gold)]/5 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-[var(--color-rose)]/5 blur-3xl" />
-        </div>
+      <main className="flex-1">
+        {/* Cinematic Hero Section */}
+        <section className="relative pt-20 pb-32 overflow-hidden border-b border-subtle">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
+            {/* Apple Style Capsule Badge */}
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-semibold uppercase tracking-widest backdrop-blur-md shadow-lg">
+              <Sparkles className="w-4 h-4" />
+              <span>{t("hero.badge")}</span>
+            </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="text-center">
-            <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 rounded-full bg-stone-100 px-4 py-1.5 text-sm text-stone-600">
-              <Sparkles className="h-4 w-4 text-[var(--color-gold)]" />
-              Цифровые приглашения нового поколения
-            </motion.div>
+            {/* Main Headline (Always readable in dark & light theme!) */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-extrabold tracking-tight leading-tight max-w-4xl mx-auto text-primary">
+              {t("hero.title")}
+            </h1>
 
-            <motion.h1 variants={fadeUp} className="font-display mx-auto max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight text-stone-900 sm:text-6xl lg:text-7xl">
-              Создайте <span className="text-[var(--color-gold)]">незабываемое</span>{" "}
-              приглашение для вашего торжества
-            </motion.h1>
+            <p className="text-lg sm:text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
+              {t("hero.subtitle")}
+            </p>
 
-            <motion.p variants={fadeUp} className="mx-auto mt-6 max-w-2xl text-lg text-stone-500 sm:text-xl">
-              Красивые шаблоны, простой редактор, мгновенная отправка гостям.
-              Бесплатно создавайте цифровые приглашения для свадьбы, дня рождения и других событий.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Link href="/register">
-                <Button size="xl" className="group">
-                  Начать бесплатно
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <Link
+                href="/wizard"
+                className="w-full sm:w-auto px-8 py-4 btn-apple-blue text-white font-bold text-base shadow-xl flex items-center justify-center space-x-2"
+              >
+                <span>{t("hero.cta")}</span>
+                <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/wedding">
-                <Button variant="outline" size="xl">Смотреть шаблоны</Button>
+              <Link
+                href="/templates"
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-surface border border-subtle text-primary font-semibold text-base hover:opacity-80 transition-all flex items-center justify-center"
+              >
+                <span>{t("hero.demo")}</span>
               </Link>
-            </motion.div>
+            </div>
+          </div>
+        </section>
 
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-stone-500">
-              {["Бесплатно", "Без карты", "5 минут до готовности"].map((c) => (
-                <span key={c} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-[var(--color-gold)]" />
-                  {c}
-                </span>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+        {/* Categories Section */}
+        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center space-y-3">
+            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-primary">
+              {t("categories.title")}
+            </h2>
+          </div>
 
-      {/* Categories */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center">
-            <motion.span variants={fadeUp} className="text-xs font-semibold uppercase tracking-widest text-stone-400">Категории</motion.span>
-            <motion.h2 variants={fadeUp} className="mt-3 font-display text-3xl font-bold text-stone-900 sm:text-4xl">Выберите тип торжества</motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mt-12 grid gap-6 sm:grid-cols-3">
-            {categories.map((cat, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <Link href={cat.href} className="group block">
-                  <div className={`rounded-3xl bg-gradient-to-br ${cat.color} p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}>
-                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm ${cat.accent}`}>
-                      <cat.icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="font-display text-2xl font-bold text-stone-900">{cat.title}</h3>
-                    <p className="mt-2 text-sm text-stone-600">{cat.desc}</p>
-                    <div className="mt-4 flex items-center gap-1 text-sm font-medium text-stone-700 group-hover:gap-2 transition-all">
-                      Смотреть <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="border-t border-stone-100 bg-stone-50 py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center">
-            <motion.span variants={fadeUp} className="text-xs font-semibold uppercase tracking-widest text-stone-400">Как это работает</motion.span>
-            <motion.h2 variants={fadeUp} className="mt-3 font-display text-3xl font-bold text-stone-900 sm:text-4xl">3 простых шага</motion.h2>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="mt-16 grid gap-8 md:grid-cols-3">
-            {steps.map((s, i) => (
-              <motion.div key={i} variants={fadeUp} className="text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-ink)] text-lg font-bold text-white">
-                  {s.step}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {categories.map((cat, idx) => (
+              <Link
+                key={idx}
+                href={`/templates?category=${cat.slug}`}
+                className={`p-6 rounded-3xl bg-card border ${cat.border} hover:scale-105 transition-all group flex flex-col justify-between h-48 shadow-xl`}
+              >
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-black transition-colors">
+                  <Heart className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-semibold text-stone-900">{s.title}</h3>
-                <p className="mt-2 text-stone-500">{s.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-[var(--color-ink)] py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.h2 variants={fadeUp} className="font-display text-3xl font-bold text-white sm:text-4xl">Готовы создать приглашение?</motion.h2>
-            <motion.p variants={fadeUp} className="mx-auto mt-4 max-w-xl text-stone-400">
-              Начните бесплатно прямо сейчас. Регистрация занимает 30 секунд.
-            </motion.p>
-            <motion.div variants={fadeUp} className="mt-8">
-              <Link href="/register">
-                <Button size="xl" variant="gold" className="group">
-                  Создать приглашение
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
+                <div>
+                  <h3 className="font-serif font-bold text-lg text-primary group-hover:text-amber-500 transition-colors">
+                    {cat.name}
+                  </h3>
+                  <span className="text-xs text-secondary">{t("categories.view_templates")} &rarr;</span>
+                </div>
               </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+
+        {/* Single Purchase Pricing Section (No Subscriptions!) */}
+        <section className="py-24 bg-surface border-t border-subtle">
+          <div className="max-w-4xl mx-auto px-4 text-center space-y-10">
+            <div className="space-y-3">
+              <span className="text-xs uppercase font-bold text-amber-500 tracking-widest">
+                Разовое создание
+              </span>
+              <h2 className="text-4xl font-serif font-bold text-primary">
+                {t("pricing.title")}
+              </h2>
+              <p className="text-secondary text-sm">
+                {t("pricing.subtitle")}
+              </p>
+            </div>
+
+            <div className="p-8 sm:p-12 rounded-3xl bg-card border border-amber-500/30 shadow-2xl space-y-8">
+              <div className="text-5xl font-serif font-extrabold text-amber-500">
+                {t("pricing.price")}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left text-sm text-secondary">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <span>{t("pricing.feature1")}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <span>{t("pricing.feature2")}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <span>{t("pricing.feature3")}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <span>{t("pricing.feature4")}</span>
+                </div>
+              </div>
+
+              <Link
+                href="/wizard"
+                className="w-full py-4 btn-apple-blue text-white font-bold text-base block shadow-xl"
+              >
+                {t("hero.cta")}
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

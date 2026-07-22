@@ -1,109 +1,98 @@
 "use client";
 
-import * as React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/shared/lib/store";
-import { useI18n } from "@/shared/i18n/provider";
-import { useToast } from "@/shared/ui/toast";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { SealSvg } from "@/shared/ui/seal-svg";
-import { Mail, Lock, User } from "lucide-react";
+import { Navbar } from "@/components/ui/Navbar";
+import { Footer } from "@/components/ui/Footer";
+import { useI18n } from "@/context/i18n-context";
+import { User, Mail, Lock, Phone } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { register } = useAuthStore();
   const { t } = useI18n();
-  const { toast } = useToast();
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await register(name, email, password);
-      router.push("/dashboard");
-    } catch {
-      toast(t("auth.registerError") || "Ошибка регистрации", "error");
-    } finally {
-      setLoading(false);
-    }
+    alert("Тіркелу сәтті өтті!");
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Decorative panel */}
-      <div className="hidden w-1/2 items-center justify-center bg-[var(--color-ink)] p-12 lg:flex">
-        <div className="text-center">
-          <SealSvg size={120} className="mx-auto mb-8 text-[var(--color-gold)]" />
-          <h2 className="font-display text-[var(--text-display-lg)] text-[var(--color-parchment)]">
-            Создайте приглашение
-          </h2>
-          <p className="mt-4 text-[var(--color-steppe)]">
-            Начните создавать цифровые приглашения для ваших торжеств
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans">
+      <Navbar />
 
-      {/* Form */}
-      <div className="flex w-full items-center justify-center p-6 lg:w-1/2">
-        <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <SealSvg size={32} />
-            <span className="font-body text-xl font-semibold">Той<span className="text-[var(--color-gold)]">ға</span></span>
+      <main className="flex-1 max-w-md mx-auto w-full px-4 py-16 flex items-center justify-center">
+        <div className="w-full bg-gradient-to-b from-[#1c1c1e] to-[#121214] border border-amber-500/30 rounded-3xl p-8 shadow-2xl space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-serif font-bold text-white">Тіркелу</h1>
+            <p className="text-xs text-gray-400">TOYGA.KZ жүйесінде жаңа аккаунт ашыңыз</p>
           </div>
 
-          <h1 className="text-[var(--text-display-md)] font-semibold text-[var(--color-ink)]">{t("auth.registerTitle") || "Регистрация"}</h1>
-          <p className="mt-2 text-sm text-[var(--color-steppe)]">
-            {t("auth.registerSubtitle") || "Создайте аккаунт для управления приглашениями"}
-          </p>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div>
+              <label className="text-xs text-gray-400">Аты-жөніңіз (ФИО):</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Абылай Хан"
+                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <Input
-              label={t("auth.name") || "Имя"}
-              type="text"
-              placeholder="Ваше имя"
-              icon={<User className="h-4 w-4" />}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <Input
-              label={t("auth.email") || "Email"}
-              type="email"
-              placeholder="email@example.com"
-              icon={<Mail className="h-4 w-4" />}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              label={t("auth.password") || "Пароль"}
-              type="password"
-              placeholder="Минимум 6 символов"
-              icon={<Lock className="h-4 w-4" />}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
-            />
-            <Button type="submit" size="lg" className="w-full" isLoading={loading}>
-              {t("auth.register") || "Зарегистрироваться"}
-            </Button>
+            <div>
+              <label className="text-xs text-gray-400">Email мекенжайы:</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="user@toyga.kz"
+                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-400">Телефон нөміріңіз:</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 707 123 45 67"
+                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-400">Пароль:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-white/10 border border-white/20 rounded-xl p-3 mt-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-sm shadow-xl shadow-amber-500/20 hover:scale-[1.02] transition-all"
+            >
+              Тіркелу
+            </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-[var(--color-steppe)]">
-            {t("auth.hasAccount") || "Уже есть аккаунт?"}{" "}
-            <Link href="/login" className="font-medium text-[var(--color-tengri)] underline-offset-4 hover:underline">
-              {t("auth.login") || "Войти"}
+          <div className="text-center text-xs text-gray-400 pt-2">
+            Аккаунтыңыз бар ма?{" "}
+            <Link href="/login" className="text-amber-400 font-bold hover:underline">
+              Кіру
             </Link>
-          </p>
+          </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

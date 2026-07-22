@@ -9,12 +9,12 @@ export default function PersonalInvitationPage() {
   const params = useParams();
   const { lang, setLang, t } = useI18n();
 
-  const guestSlug = (params?.guest_slug as str) || "erzhan";
+  const guestSlug = (params?.guest_slug as string) || "erzhan";
   const guestName = guestSlug === "erzhan" ? "Ержан мырза" : "Құрметті қонақ";
 
   const [status, setStatus] = useState<"accepted" | "declined" | "pending">("pending");
   const [guestsCount, setGuestsCount] = useState<number>(1);
-  const [comment, setComment] = useState<str>("");
+  const [comment, setComment] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,17 +29,15 @@ export default function PersonalInvitationPage() {
         <Globe className="w-4 h-4 text-amber-400 ml-2 mr-1" />
         <button
           onClick={() => setLang("kk")}
-          className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-            lang === "kk" ? "bg-amber-500 text-black shadow-lg" : "text-white/70 hover:text-white"
-          }`}
+          className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${lang === "kk" ? "bg-amber-500 text-black shadow-lg" : "text-white/70 hover:text-white"
+            }`}
         >
           ҚАЗ
         </button>
         <button
           onClick={() => setLang("ru")}
-          className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-            lang === "ru" ? "bg-amber-500 text-black shadow-lg" : "text-white/70 hover:text-white"
-          }`}
+          className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${lang === "ru" ? "bg-amber-500 text-black shadow-lg" : "text-white/70 hover:text-white"
+            }`}
         >
           РУС
         </button>
@@ -63,7 +61,7 @@ export default function PersonalInvitationPage() {
             {guestName}
           </h1>
           <p className="text-sm text-gray-400 mt-2">
-            {lang === "kk" 
+            {lang === "kk"
               ? "Сізді Омар мен Маржанның үйлену тойына арнайы шақырамыз!"
               : "Приглашаем вас на свадьбу Омара и Маржан!"}
           </p>
@@ -99,11 +97,10 @@ export default function PersonalInvitationPage() {
               <button
                 type="button"
                 onClick={() => setStatus("accepted")}
-                className={`flex items-center justify-center space-x-2 py-3 rounded-2xl text-sm font-semibold border transition-all ${
-                  status === "accepted"
+                className={`flex items-center justify-center space-x-2 py-3 rounded-2xl text-sm font-semibold border transition-all ${status === "accepted"
                     ? "bg-amber-500 text-black border-amber-400 shadow-lg shadow-amber-500/20"
                     : "bg-white/5 text-gray-300 border-white/10 hover:border-amber-500/50"
-                }`}
+                  }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{t("rsvp.accept")}</span>
@@ -112,11 +109,10 @@ export default function PersonalInvitationPage() {
               <button
                 type="button"
                 onClick={() => setStatus("declined")}
-                className={`flex items-center justify-center space-x-2 py-3 rounded-2xl text-sm font-semibold border transition-all ${
-                  status === "declined"
+                className={`flex items-center justify-center space-x-2 py-3 rounded-2xl text-sm font-semibold border transition-all ${status === "declined"
                     ? "bg-rose-500/80 text-white border-rose-500 shadow-lg shadow-rose-500/20"
                     : "bg-white/5 text-gray-300 border-white/10 hover:border-rose-500/50"
-                }`}
+                  }`}
               >
                 <XCircle className="w-4 h-4" />
                 <span>{t("rsvp.decline")}</span>
@@ -171,8 +167,8 @@ export default function PersonalInvitationPage() {
               {t("rsvp.success")}
             </h3>
             <p className="text-xs text-gray-300">
-              {status === "accepted" 
-                ? `${guestsCount} адам болып қатысуыңыз тіркелді.` 
+              {status === "accepted"
+                ? `${guestsCount} адам болып қатысуыңыз тіркелді.`
                 : "Жауабыңыз ұйымдастырушыларға жеткізілді."}
             </p>
           </div>
